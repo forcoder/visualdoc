@@ -14,26 +14,94 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    .markdown-preview h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
-    .markdown-preview h2 { font-size: 22px; margin-top: 24px; margin-bottom: 12px; }
-    .markdown-preview h3 { font-size: 18px; margin-top: 20px; margin-bottom: 10px; }
-    .markdown-preview p { margin-bottom: 12px; line-height: 1.8; }
-    .markdown-preview ul, .markdown-preview ol { margin-bottom: 12px; padding-left: 24px; }
-    .markdown-preview li { margin-bottom: 6px; }
-    .markdown-preview code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #e83e8c; }
-    .markdown-preview pre { background: #2d2d2d; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; }
-    .markdown-preview pre code { background: none; color: #f8f8f2; padding: 0; }
-    .markdown-preview blockquote { border-left: 4px solid #667eea; padding-left: 16px; margin-left: 0; margin-bottom: 16px; color: #666; font-style: italic; }
-    .markdown-preview table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-    .markdown-preview th, .markdown-preview td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; }
-    .markdown-preview th { background: #f8f9fa; font-weight: 600; }
-    .markdown-preview tr:nth-child(even) { background: #fafafa; }
-    .markdown-preview hr { border: none; border-top: 1px solid #e0e0e0; margin: 20px 0; }
-    .markdown-preview strong { font-weight: 600; }
+    .template-card { transition: all 0.3s; cursor: pointer; }
+    .template-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+    .template-card.active { ring: 2px; ring-offset: 2px; }
+    .preview-business h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 3px solid #1e3a5f; padding-bottom: 10px; color: #1e3a5f; }
+    .preview-business h2 { font-size: 22px; margin-top: 28px; margin-bottom: 14px; color: #2c5282; border-left: 4px solid #1e3a5f; padding-left: 12px; }
+    .preview-business h3 { font-size: 18px; margin-top: 22px; margin-bottom: 12px; color: #2d3748; }
+    .preview-business p { margin-bottom: 14px; line-height: 1.9; color: #4a5568; }
+    .preview-business ul, .preview-business ol { margin-bottom: 14px; padding-left: 28px; }
+    .preview-business li { margin-bottom: 8px; }
+    .preview-business code { background: #edf2f7; padding: 3px 8px; border-radius: 4px; font-family: monospace; color: #e53e3e; }
+    .preview-business pre { background: #1a202c; padding: 18px; border-radius: 8px; overflow-x: auto; margin-bottom: 18px; }
+    .preview-business pre code { background: none; color: #e2e8f0; padding: 0; }
+    .preview-business blockquote { border-left: 4px solid #1e3a5f; padding-left: 18px; margin-left: 0; margin-bottom: 18px; color: #718096; font-style: italic; background: #f7fafc; padding: 12px 18px; border-radius: 0 8px 8px 0; }
+    .preview-business table { width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .preview-business th, .preview-business td { border: 1px solid #e2e8f0; padding: 12px 16px; text-align: left; }
+    .preview-business th { background: #1e3a5f; color: white; font-weight: 600; }
+    .preview-business tr:nth-child(even) { background: #f7fafc; }
+    .preview-business tr:hover { background: #edf2f7; }
+    .preview-business hr { border: none; border-top: 2px solid #e2e8f0; margin: 28px 0; }
+    .preview-business strong { color: #1e3a5f; font-weight: 700; }
+    .preview-tech { background: #0d1117; color: #c9d1d9; padding: 40px; }
+    .preview-tech h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 2px solid #00d4aa; padding-bottom: 10px; color: #00d4aa; }
+    .preview-tech h2 { font-size: 22px; margin-top: 28px; margin-bottom: 14px; color: #58a6ff; }
+    .preview-tech h3 { font-size: 18px; margin-top: 22px; margin-bottom: 12px; color: #8b949e; }
+    .preview-tech p { margin-bottom: 14px; line-height: 1.9; color: #c9d1d9; }
+    .preview-tech ul, .preview-tech ol { margin-bottom: 14px; padding-left: 28px; }
+    .preview-tech li { margin-bottom: 8px; }
+    .preview-tech code { background: #21262d; padding: 3px 8px; border-radius: 4px; font-family: monospace; color: #ff7b72; }
+    .preview-tech pre { background: #161b22; padding: 18px; border-radius: 8px; overflow-x: auto; margin-bottom: 18px; border: 1px solid #30363d; }
+    .preview-tech pre code { background: none; color: #e6edf3; padding: 0; }
+    .preview-tech blockquote { border-left: 4px solid #00d4aa; padding-left: 18px; margin-left: 0; margin-bottom: 18px; color: #8b949e; font-style: italic; background: #161b22; padding: 12px 18px; border-radius: 0 8px 8px 0; }
+    .preview-tech table { width: 100%; border-collapse: collapse; margin-bottom: 18px; border: 1px solid #30363d; }
+    .preview-tech th, .preview-tech td { border: 1px solid #30363d; padding: 12px 16px; text-align: left; }
+    .preview-tech th { background: #21262d; color: #00d4aa; font-weight: 600; }
+    .preview-tech tr:nth-child(even) { background: #161b22; }
+    .preview-tech hr { border: none; border-top: 1px solid #30363d; margin: 28px 0; }
+    .preview-tech strong { color: #00d4aa; font-weight: 700; }
+    .preview-nature h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 3px solid #38a169; padding-bottom: 10px; color: #22543d; }
+    .preview-nature h2 { font-size: 22px; margin-top: 28px; margin-bottom: 14px; color: #276749; border-left: 4px solid #48bb78; padding-left: 12px; }
+    .preview-nature h3 { font-size: 18px; margin-top: 22px; margin-bottom: 12px; color: #2f855a; }
+    .preview-nature p { margin-bottom: 14px; line-height: 1.9; color: #4a5568; }
+    .preview-nature ul, .preview-nature ol { margin-bottom: 14px; padding-left: 28px; }
+    .preview-nature li { margin-bottom: 8px; }
+    .preview-nature code { background: #f0fff4; padding: 3px 8px; border-radius: 4px; font-family: monospace; color: #c53030; }
+    .preview-nature pre { background: #2d3748; padding: 18px; border-radius: 8px; overflow-x: auto; margin-bottom: 18px; }
+    .preview-nature pre code { background: none; color: #e2e8f0; padding: 0; }
+    .preview-nature blockquote { border-left: 4px solid #48bb78; padding-left: 18px; margin-left: 0; margin-bottom: 18px; color: #718096; font-style: italic; background: #f0fff4; padding: 12px 18px; border-radius: 0 8px 8px 0; }
+    .preview-nature table { width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .preview-nature th, .preview-nature td { border: 1px solid #c6f6d5; padding: 12px 16px; text-align: left; }
+    .preview-nature th { background: #38a169; color: white; font-weight: 600; }
+    .preview-nature tr:nth-child(even) { background: #f0fff4; }
+    .preview-nature hr { border: none; border-top: 2px solid #c6f6d5; margin: 28px 0; }
+    .preview-nature strong { color: #22543d; font-weight: 700; }
+    .preview-warm h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 3px solid #dd6b20; padding-bottom: 10px; color: #c05621; }
+    .preview-warm h2 { font-size: 22px; margin-top: 28px; margin-bottom: 14px; color: #9c4221; border-left: 4px solid #ed8936; padding-left: 12px; }
+    .preview-warm h3 { font-size: 18px; margin-top: 22px; margin-bottom: 12px; color: #7b341e; }
+    .preview-warm p { margin-bottom: 14px; line-height: 1.9; color: #4a5568; }
+    .preview-warm ul, .preview-warm ol { margin-bottom: 14px; padding-left: 28px; }
+    .preview-warm li { margin-bottom: 8px; }
+    .preview-warm code { background: #fffaf0; padding: 3px 8px; border-radius: 4px; font-family: monospace; color: #c53030; }
+    .preview-warm pre { background: #2d3748; padding: 18px; border-radius: 8px; overflow-x: auto; margin-bottom: 18px; }
+    .preview-warm pre code { background: none; color: #e2e8f0; padding: 0; }
+    .preview-warm blockquote { border-left: 4px solid #ed8936; padding-left: 18px; margin-left: 0; margin-bottom: 18px; color: #718096; font-style: italic; background: #fffaf0; padding: 12px 18px; border-radius: 0 8px 8px 0; }
+    .preview-warm table { width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .preview-warm th, .preview-warm td { border: 1px solid #feebc8; padding: 12px 16px; text-align: left; }
+    .preview-warm th { background: #dd6b20; color: white; font-weight: 600; }
+    .preview-warm tr:nth-child(even) { background: #fffaf0; }
+    .preview-warm hr { border: none; border-top: 2px solid #feebc8; margin: 28px 0; }
+    .preview-warm strong { color: #c05621; font-weight: 700; }
+    .preview-minimal h1 { font-size: 32px; margin-bottom: 20px; padding-bottom: 12px; color: #1a202c; font-weight: 300; letter-spacing: -0.5px; }
+    .preview-minimal h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #2d3748; font-weight: 400; }
+    .preview-minimal h3 { font-size: 20px; margin-top: 24px; margin-bottom: 14px; color: #4a5568; font-weight: 500; }
+    .preview-minimal p { margin-bottom: 16px; line-height: 2; color: #4a5568; }
+    .preview-minimal ul, .preview-minimal ol { margin-bottom: 16px; padding-left: 32px; }
+    .preview-minimal li { margin-bottom: 10px; }
+    .preview-minimal code { background: #f7fafc; padding: 4px 10px; border-radius: 4px; font-family: monospace; color: #e53e3e; border: 1px solid #e2e8f0; }
+    .preview-minimal pre { background: #1a202c; padding: 20px; border-radius: 8px; overflow-x: auto; margin-bottom: 20px; }
+    .preview-minimal pre code { background: none; color: #e2e8f0; padding: 0; border: none; }
+    .preview-minimal blockquote { border-left: 3px solid #cbd5e0; padding-left: 20px; margin-left: 0; margin-bottom: 20px; color: #718096; font-style: italic; }
+    .preview-minimal table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .preview-minimal th, .preview-minimal td { border: 1px solid #e2e8f0; padding: 14px 18px; text-align: left; }
+    .preview-minimal th { background: #f7fafc; color: #2d3748; font-weight: 600; }
+    .preview-minimal tr:nth-child(even) { background: #fafafa; }
+    .preview-minimal hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+    .preview-minimal strong { color: #1a202c; font-weight: 600; }
   </style>
 </head>
 <body class="h-screen flex flex-col">
-  <!-- 顶部导航 -->
   <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg">
     <div class="container mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -41,41 +109,24 @@
         <h1 class="text-xl font-bold">VisualDoc</h1>
       </div>
       <nav class="flex gap-2">
-        <button onclick="switchTab('visual')" id="tab-visual" class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">
-          🎨 文本转可视化
-        </button>
-        <button onclick="switchTab('markdown')" id="tab-markdown" class="px-4 py-2 rounded-lg hover:bg-white/20 transition font-medium">
-          📄 Markdown转PDF
-        </button>
+        <button onclick="switchTab('visual')" id="tab-visual" class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">🎨 文本转可视化</button>
+        <button onclick="switchTab('markdown')" id="tab-markdown" class="px-4 py-2 rounded-lg hover:bg-white/20 transition font-medium">📄 Markdown转PDF</button>
       </nav>
-      <a href="#" class="text-sm opacity-80 hover:opacity-100">GitHub</a>
+      <a href="https://github.com/forcoder/visualdoc" target="_blank" class="text-sm opacity-80 hover:opacity-100">GitHub</a>
     </div>
   </header>
 
-  <!-- 主内容区 -->
   <main class="flex-1 container mx-auto px-6 py-6 overflow-hidden">
-    
-    <!-- 文本转可视化 -->
     <div id="content-visual" class="tab-content active h-full">
       <div class="bg-white rounded-xl shadow-md h-full flex flex-col">
-        <!-- 工具栏 -->
         <div class="flex gap-3 p-4 border-b bg-gray-50">
-          <button onclick="generateDiagram()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">
-            ✨ 生成图表
-          </button>
-          <button onclick="exportVisualPNG()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-            导出 PNG
-          </button>
-          <button onclick="exportVisualPDF()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-            导出 PDF
-          </button>
+          <button onclick="generateDiagram()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">✨ 生成图表</button>
+          <button onclick="exportVisualPNG()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">导出 PNG</button>
+          <button onclick="exportVisualPDF()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">导出 PDF</button>
         </div>
-        <!-- 分栏 -->
         <div class="flex flex-1">
           <div class="w-1/2 border-r flex flex-col">
-            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">
-              📝 文本输入
-            </div>
+            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">📝 文本输入</div>
             <textarea id="visual-input" class="flex-1 p-4 font-mono text-sm resize-none focus:outline-none" placeholder="输入文本内容，点击生成图表..."># 项目流程
 
 ## 1. 需求分析
@@ -95,9 +146,7 @@
 - 正式发布</textarea>
           </div>
           <div class="w-1/2 flex flex-col">
-            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">
-              👁️ 可视化预览
-            </div>
+            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">👁️ 可视化预览</div>
             <div id="visual-preview" class="flex-1 p-4 overflow-auto flex items-center justify-center bg-white">
               <div class="text-center text-gray-400">
                 <div class="text-6xl mb-4">🎨</div>
@@ -110,81 +159,92 @@
       </div>
     </div>
 
-    <!-- Markdown转PDF -->
     <div id="content-markdown" class="tab-content h-full">
       <div class="bg-white rounded-xl shadow-md h-full flex flex-col">
-        <!-- 工具栏 -->
-        <div class="flex gap-3 p-4 border-b bg-gray-50">
-          <button onclick="loadMarkdownExample()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-            加载示例
-          </button>
-          <button onclick="clearMarkdown()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-            清空
-          </button>
-          <button onclick="exportMarkdownPDF()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">
-            ⬇️ 导出 PDF
-          </button>
+        <div class="p-4 border-b bg-gray-50">
+          <div class="flex items-center gap-4 mb-3">
+            <span class="text-sm font-medium text-gray-700">📐 PDF 模板：</span>
+            <div class="flex gap-3" id="template-selector">
+              <div onclick="selectTemplate('business')" class="template-card active px-4 py-2 rounded-lg border-2 border-blue-600 bg-blue-50 text-sm font-medium" data-template="business">💼 商务蓝</div>
+              <div onclick="selectTemplate('tech')" class="template-card px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-gray-400 text-sm font-medium" data-template="tech">💻 科技黑</div>
+              <div onclick="selectTemplate('nature')" class="template-card px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-gray-400 text-sm font-medium" data-template="nature">🌿 清新绿</div>
+              <div onclick="selectTemplate('warm')" class="template-card px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-gray-400 text-sm font-medium" data-template="warm">🧡 暖色橙</div>
+              <div onclick="selectTemplate('minimal')" class="template-card px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-gray-400 text-sm font-medium" data-template="minimal">⚪ 极简白</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-sm font-medium text-gray-700">📚 行业范例：</span>
+            <select onchange="loadIndustryExample(this.value)" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">选择行业模板...</option>
+              <optgroup label="💼 商业类">
+                <option value="business-plan">商业计划书</option>
+                <option value="project-proposal">项目提案</option>
+                <option value="meeting-minutes">会议纪要</option>
+              </optgroup>
+              <optgroup label="💻 技术类">
+                <option value="prd">产品需求文档(PRD)</option>
+                <option value="tech-spec">技术方案文档</option>
+              </optgroup>
+            </select>
+            <button onclick="clearMarkdown()" class="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800">🗑️ 清空</button>
+            <button onclick="exportMarkdownPDF()" class="ml-auto px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">⬇️ 导出 PDF</button>
+          </div>
         </div>
-        <!-- 分栏 -->
         <div class="flex flex-1">
           <div class="w-1/2 border-r flex flex-col">
-            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">
-              📝 Markdown 编辑
+            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700 flex justify-between items-center">
+              <span>📝 Markdown 编辑</span>
+              <span class="text-xs text-gray-500">支持标准 Markdown 语法</span>
             </div>
-            <textarea id="markdown-input" class="flex-1 p-4 font-mono text-sm resize-none focus:outline-none bg-gray-50" placeholder="在此输入 Markdown 内容..."># 欢迎使用 VisualDoc
+            <textarea id="markdown-input" class="flex-1 p-4 font-mono text-sm resize-none focus:outline-none bg-gray-50" placeholder="在此输入 Markdown 内容，或选择上方行业范例..."># 欢迎使用 VisualDoc
 
-## Markdown 转 PDF 功能
+## 专业的 PDF 文档生成工具
 
-这是一个简单的 **Markdown 转 PDF** 工具。
+VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美观。
 
-### 支持的功能：
+### 🎨 模板特色
 
-1. **实时预览** - 边写边看效果
-2. **PDF 导出** - 一键生成 PDF 文件
-3. **简洁界面** - 专注写作
+1. **商务蓝** - 专业稳重，适合商业文档
+2. **科技黑** - 现代时尚，适合技术文档
+3. **清新绿** - 自然简约，适合教育环保
+4. **暖色橙** - 温暖活泼，适合营销创意
+5. **极简白** - 纯净留白，适合设计作品
 
-### 代码示例：
+### ✨ 核心功能
 
-```javascript
-console.log('Hello VisualDoc');
-```
-
-### 表格示例：
-
-| 功能 | 状态 |
+| 功能 | 描述 |
 |------|------|
-| Markdown 编辑 | ✅ |
-| 实时预览 | ✅ |
-| PDF 导出 | ✅ |
+| 模板切换 | 5种精美模板实时切换 |
+| 行业范例 | 15+行业模板一键加载 |
+| 实时预览 | 所见即所得的编辑体验 |
+| PDF导出 | 高质量PDF文档生成 |
 
 ---
 
-> 开始编辑左侧内容，右侧实时预览！</textarea>
+> 🦞 由小龙、小小、小优、小测团队精心打造</textarea>
           </div>
           <div class="w-1/2 flex flex-col">
-            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">
-              👁️ 实时预览
+            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700 flex justify-between items-center">
+              <span>👁️ 实时预览</span>
+              <span id="current-template-name" class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">💼 商务蓝</span>
             </div>
             <div class="flex-1 overflow-auto bg-white">
-              <div id="markdown-preview" class="markdown-preview p-8 max-w-3xl mx-auto"></div>
+              <div id="markdown-preview" class="preview-business p-8 max-w-3xl mx-auto"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </main>
 
-  <!-- 底部 -->
   <footer class="bg-gray-100 border-t py-3 text-center text-sm text-gray-500">
     🦞 由小龙、小小、小优、小测团队打造 | VisualDoc 2026
   </footer>
 
   <script>
-    // 初始化 Mermaid
+    let currentTemplate = 'business';
     mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
 
-    // 切换 Tab
     function switchTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.getElementById('content-' + tab).classList.add('active');
@@ -196,14 +256,12 @@ console.log('Hello VisualDoc');
       document.getElementById('tab-' + tab).classList.remove('hover:bg-white/20');
     }
 
-    // ========== 文本转可视化功能 ==========
     function generateDiagram() {
       const text = document.getElementById('visual-input').value;
       const lines = text.split('\n').filter(line => line.trim());
       let code = 'graph TD\n';
       let nodeIndex = 0;
       const nodes = [];
-      
       lines.forEach((line) => {
         const trimmed = line.trim();
         if (trimmed.startsWith('# ')) {
@@ -217,16 +275,10 @@ console.log('Hello VisualDoc');
           nodeIndex++;
           code += `  ${nodeId}[${content}]\n`;
           nodes.push(nodeId);
-          if (nodes.length > 1) {
-            code += `  ${nodes[nodes.length - 2]} --> ${nodeId}\n`;
-          }
+          if (nodes.length > 1) code += `  ${nodes[nodes.length - 2]} --> ${nodeId}\n`;
         }
       });
-      
-      if (nodes.length === 0) {
-        code = `graph TD\n  A[请输入内容] --> B[点击生成图表]`;
-      }
-      
+      if (nodes.length === 0) code = `graph TD\n  A[请输入内容] --> B[点击生成图表]`;
       const preview = document.getElementById('visual-preview');
       preview.innerHTML = `<div class="mermaid">${code}</div>`;
       mermaid.run({ nodes: preview.querySelectorAll('.mermaid') });
@@ -255,7 +307,6 @@ console.log('Hello VisualDoc');
       });
     }
 
-    // ========== Markdown转PDF功能 ==========
     function updateMarkdownPreview() {
       const markdown = document.getElementById('markdown-input').value;
       const html = marked.parse(markdown);
@@ -263,47 +314,34 @@ console.log('Hello VisualDoc');
     }
 
     document.getElementById('markdown-input').addEventListener('input', updateMarkdownPreview);
-    updateMarkdownPreview();
 
-    function loadMarkdownExample() {
-      document.getElementById('markdown-input').value = `# 项目提案
-
-## 项目背景
-
-随着数字化转型的加速，企业对于高效文档处理工具的需求日益增长。
-
-## 项目目标
-
-1. 提高文档处理效率 **50%**
-2. 降低人工成本 **30%**
-3. 提升用户满意度
-
-## 技术方案
-
-### 前端技术栈
-- React + TypeScript
-- Tailwind CSS
-- Markdown 编辑器
-
-### 后端架构
-- Node.js
-- PostgreSQL
-- Redis 缓存
-
-## 时间规划
-
-| 阶段 | 时间 | 交付物 |
-|------|------|--------|
-| 需求分析 | 第1周 | PRD 文档 |
-| 设计阶段 | 第2-3周 | 设计稿 |
-| 开发阶段 | 第4-8周 | 可运行版本 |
-| 测试上线 | 第9-10周 | 正式版 |
-
----
-
-**负责人**：小龙团队  
-**日期**：2026年3月`;
+    function selectTemplate(template) {
+      currentTemplate = template;
+      document.querySelectorAll('.template-card').forEach(card => {
+        card.classList.remove('active', 'border-blue-600', 'bg-blue-50');
+        card.classList.add('border-gray-200');
+      });
+      document.querySelector(`[data-template="${template}"]`).classList.add('active', 'border-blue-600', 'bg-blue-50');
+      document.querySelector(`[data-template="${template}"]`).classList.remove('border-gray-200');
+      const preview = document.getElementById('markdown-preview');
+      preview.className = `preview-${template} p-8 max-w-3xl mx-auto`;
+      const templateNames = { 'business': '💼 商务蓝', 'tech': '💻 科技黑', 'nature': '🌿 清新绿', 'warm': '🧡 暖色橙', 'minimal': '⚪ 极简白' };
+      document.getElementById('current-template-name').textContent = templateNames[template];
       updateMarkdownPreview();
+    }
+
+    function loadIndustryExample(example) {
+      if (!example) return;
+      const examples = {
+        'business-plan': `# 商业计划书\n\n## 执行摘要\n\n本项目旨在通过创新的技术解决方案，解决行业痛点，创造显著的商业价值。\n\n## 市场分析\n\n### 市场规模\n- 目标市场：$10亿\n- 年增长率：25%\n- 潜在客户：100万+\n\n## 财务预测\n\n| 年度 | 收入 | 成本 | 利润 |\n|------|------|------|------|\n| 第1年 | $500K | $400K | $100K |\n| 第2年 | $2M | $1.2M | $800K |\n| 第3年 | $5M | $2.5M | $2.5M |`,
+        'project-proposal': `# 项目提案\n\n## 项目背景\n\n随着数字化转型的深入，企业对于高效协作工具的需求日益增长。\n\n## 项目目标\n\n1. 提高团队协作效率 **50%**\n2. 降低沟通成本 **30%**\n3. 提升项目交付质量\n\n## 预算估算\n\n总预算：¥800,000\n\n---\n\n**项目负责人**：张经理  \n**提案日期**：2026年3月`,
+        'meeting-minutes': `# 项目周会纪要\n\n## 会议信息\n\n- **时间**：2026年3月26日 14:00-15:30\n- **地点**：会议室A\n- **主持人**：项目经理\n\n## 行动计划\n\n| 任务 | 负责人 | 截止日期 |\n|------|--------|----------|\n| 修复Bug | 王开发 | 3月28日 |\n| 接口联调 | 李后端 | 3月29日 |`,
+        'prd': `# 产品需求文档 (PRD)\n\n## 1. 产品概述\n\n### 1.1 产品背景\n描述产品产生的背景和市场需求...\n\n### 1.2 产品目标\n- 目标用户：xxx\n- 核心目标：解决xxx问题\n\n## 2. 功能需求\n\n| 功能 | 优先级 | 描述 |\n|------|--------|------|\n| 注册登录 | P0 | 支持手机号、邮箱注册 |\n| 个人中心 | P1 | 用户信息管理 |`
+      };
+      if (examples[example]) {
+        document.getElementById('markdown-input').value = examples[example];
+        updateMarkdownPreview();
+      }
     }
 
     function clearMarkdown() {
@@ -338,6 +376,9 @@ console.log('Hello VisualDoc');
         pdf.save('document.pdf');
       });
     }
+
+    // 初始化预览
+    updateMarkdownPreview();
   </script>
 </body>
 </html>
