@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisualDoc - 可视化文档工具</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .markdown-preview h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
+    .markdown-preview h2 { font-size: 22px; margin-top: 24px; margin-bottom: 12px; }
+    .markdown-preview h3 { font-size: 18px; margin-top: 20px; margin-bottom: 10px; }
+    .markdown-preview p { margin-bottom: 12px; line-height: 1.8; }
+    .markdown-preview ul, .markdown-preview ol { margin-bottom: 12px; padding-left: 24px; }
+    .markdown-preview li { margin-bottom: 6px; }
+    .markdown-preview code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #e83e8c; }
+    .markdown-preview pre { background: #2d2d2d; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; }
+    .markdown-preview pre code { background: none; color: #f8f8f2; padding: 0; }
+    .markdown-preview blockquote { border-left: 4px solid #667eea; padding-left: 16px; margin-left: 0; margin-bottom: 16px; color: #666; font-style: italic; }
+    .markdown-preview table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    .markdown-preview th, .markdown-preview td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; }
+    .markdown-preview th { background: #f8f9fa; font-weight: 600; }
+    .markdown-preview tr:nth-child(even) { background: #fafafa; }
+    .markdown-preview hr { border: none; border-top: 1px solid #e0e0e0; margin: 20px 0; }
+    .markdown-preview strong { font-weight: 600; }
+  </style>
+</head>
+<body class="h-screen flex flex-col">
+  <!-- 顶部导航 -->
+  <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🎨</span>
+        <h1 class="text-xl font-bold">VisualDoc</h1>
+      </div>
+      <nav class="flex gap-2">
+        <button onclick="switchTab('visual')" id="tab-visual" class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">
+          🎨 文本转可视化
+        </button>
+        <button onclick="switchTab('markdown')" id="tab-markdown" class="px-4 py-2 rounded-lg hover:bg-white/20 transition font-medium">
+          📄 Markdown转PDF
+        </button>
+      </nav>
+      <a href="#" class="text-sm opacity-80 hover:opacity-100">GitHub</a>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="flex-1 container mx-auto px-6 py-6 overflow-hidden">
+    
+    <!-- 文本转可视化 -->
+    <div id="content-visual" class="tab-content active h-full">
+      <div class="bg-white rounded-xl shadow-md h-full flex flex-col">
+        <!-- 工具栏 -->
+        <div class="flex gap-3 p-4 border-b bg-gray-50">
+          <button onclick="generateDiagram()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">
+            ✨ 生成图表
+          </button>
+          <button onclick="exportVisualPNG()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            导出 PNG
+          </button>
+          <button onclick="exportVisualPDF()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            导出 PDF
+          </button>
+        </div>
+        <!-- 分栏 -->
+        <div class="flex flex-1">
+          <div class="w-1/2 border-r flex flex-col">
+            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">
+              📝 文本输入
+            </div>
+            <textarea id="visual-input" class="flex-1 p-4 font-mono text-sm resize-none focus:outline-none" placeholder="输入文本内容，点击生成图表..."># 项目流程
+
+## 1. 需求分析
+- 收集用户需求
+- 竞品分析
+
+## 2. 设计阶段
+- UI设计
+- 原型制作
+
+## 3. 开发阶段
+- 前端开发
+- 后端开发
+
+## 4. 测试上线
+- 功能测试
+- 正式发布</textarea>
+          </div>
+          <div class="w-1/2 flex flex-col">
+            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">
+              👁️ 可视化预览
+            </div>
+            <div id="visual-preview" class="flex-1 p-4 overflow-auto flex items-center justify-center bg-white">
+              <div class="text-center text-gray-400">
+                <div class="text-6xl mb-4">🎨</div>
+                <p>点击"生成图表"按钮</p>
+                <p>将文本转换为可视化图表</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Markdown转PDF -->
+    <div id="content-markdown" class="tab-content h-full">
+      <div class="bg-white rounded-xl shadow-md h-full flex flex-col">
+        <!-- 工具栏 -->
+        <div class="flex gap-3 p-4 border-b bg-gray-50">
+          <button onclick="loadMarkdownExample()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            加载示例
+          </button>
+          <button onclick="clearMarkdown()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            清空
+          </button>
+          <button onclick="exportMarkdownPDF()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">
+            ⬇️ 导出 PDF
+          </button>
+        </div>
+        <!-- 分栏 -->
+        <div class="flex flex-1">
+          <div class="w-1/2 border-r flex flex-col">
+            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">
+              📝 Markdown 编辑
+            </div>
+            <textarea id="markdown-input" class="flex-1 p-4 font-mono text-sm resize-none focus:outline-none bg-gray-50" placeholder="在此输入 Markdown 内容..."># 欢迎使用 VisualDoc
+
+## Markdown 转 PDF 功能
+
+这是一个简单的 **Markdown 转 PDF** 工具。
+
+### 支持的功能：
+
+1. **实时预览** - 边写边看效果
+2. **PDF 导出** - 一键生成 PDF 文件
+3. **简洁界面** - 专注写作
+
+### 代码示例：
+
+```javascript
+console.log('Hello VisualDoc');
+```
+
+### 表格示例：
+
+| 功能 | 状态 |
+|------|------|
+| Markdown 编辑 | ✅ |
+| 实时预览 | ✅ |
+| PDF 导出 | ✅ |
+
+---
+
+> 开始编辑左侧内容，右侧实时预览！</textarea>
+          </div>
+          <div class="w-1/2 flex flex-col">
+            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">
+              👁️ 实时预览
+            </div>
+            <div class="flex-1 overflow-auto bg-white">
+              <div id="markdown-preview" class="markdown-preview p-8 max-w-3xl mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 底部 -->
+  <footer class="bg-gray-100 border-t py-3 text-center text-sm text-gray-500">
+    🦞 由小龙、小小、小优、小测团队打造 | VisualDoc 2026
+  </footer>
+
+  <script>
+    // 初始化 Mermaid
+    mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+
+    // 切换 Tab
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('content-' + tab).classList.add('active');
+      document.querySelectorAll('nav button').forEach(el => {
+        el.classList.remove('bg-white/20');
+        el.classList.add('hover:bg-white/20');
+      });
+      document.getElementById('tab-' + tab).classList.add('bg-white/20');
+      document.getElementById('tab-' + tab).classList.remove('hover:bg-white/20');
+    }
+
+    // ========== 文本转可视化功能 ==========
+    function generateDiagram() {
+      const text = document.getElementById('visual-input').value;
+      const lines = text.split('\n').filter(line => line.trim());
+      let code = 'graph TD\n';
+      let nodeIndex = 0;
+      const nodes = [];
+      
+      lines.forEach((line) => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('# ')) {
+          const content = trimmed.replace('# ', '');
+          nodeIndex++;
+          code += `  A[${content}]\n`;
+          nodes.push('A');
+        } else if (trimmed.startsWith('## ')) {
+          const content = trimmed.replace('## ', '');
+          const nodeId = String.fromCharCode(65 + nodeIndex);
+          nodeIndex++;
+          code += `  ${nodeId}[${content}]\n`;
+          nodes.push(nodeId);
+          if (nodes.length > 1) {
+            code += `  ${nodes[nodes.length - 2]} --> ${nodeId}\n`;
+          }
+        }
+      });
+      
+      if (nodes.length === 0) {
+        code = `graph TD\n  A[请输入内容] --> B[点击生成图表]`;
+      }
+      
+      const preview = document.getElementById('visual-preview');
+      preview.innerHTML = `<div class="mermaid">${code}</div>`;
+      mermaid.run({ nodes: preview.querySelectorAll('.mermaid') });
+    }
+
+    function exportVisualPNG() {
+      const preview = document.getElementById('visual-preview');
+      html2canvas(preview, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'chart.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+
+    function exportVisualPDF() {
+      const preview = document.getElementById('visual-preview');
+      html2canvas(preview, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save('chart.pdf');
+      });
+    }
+
+    // ========== Markdown转PDF功能 ==========
+    function updateMarkdownPreview() {
+      const markdown = document.getElementById('markdown-input').value;
+      const html = marked.parse(markdown);
+      document.getElementById('markdown-preview').innerHTML = html;
+    }
+
+    document.getElementById('markdown-input').addEventListener('input', updateMarkdownPreview);
+    updateMarkdownPreview();
+
+    function loadMarkdownExample() {
+      document.getElementById('markdown-input').value = `# 项目提案
+
+## 项目背景
+
+随着数字化转型的加速，企业对于高效文档处理工具的需求日益增长。
+
+## 项目目标
+
+1. 提高文档处理效率 **50%**
+2. 降低人工成本 **30%**
+3. 提升用户满意度
+
+## 技术方案
+
+### 前端技术栈
+- React + TypeScript
+- Tailwind CSS
+- Markdown 编辑器
+
+### 后端架构
+- Node.js
+- PostgreSQL
+- Redis 缓存
+
+## 时间规划
+
+| 阶段 | 时间 | 交付物 |
+|------|------|--------|
+| 需求分析 | 第1周 | PRD 文档 |
+| 设计阶段 | 第2-3周 | 设计稿 |
+| 开发阶段 | 第4-8周 | 可运行版本 |
+| 测试上线 | 第9-10周 | 正式版 |
+
+---
+
+**负责人**：小龙团队  
+**日期**：2026年3月`;
+      updateMarkdownPreview();
+    }
+
+    function clearMarkdown() {
+      if (confirm('确定要清空内容吗？')) {
+        document.getElementById('markdown-input').value = '';
+        updateMarkdownPreview();
+      }
+    }
+
+    function exportMarkdownPDF() {
+      const preview = document.getElementById('markdown-preview');
+      html2canvas(preview, { backgroundColor: '#ffffff', scale: 2, useCORS: true }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+        const imgX = (pdfWidth - imgWidth * ratio) / 2;
+        let imgY = 10;
+        const scaledHeight = imgHeight * ratio * (pdfWidth / (imgWidth * ratio));
+        let heightLeft = scaledHeight;
+        pdf.addImage(imgData, 'PNG', imgX, imgY, pdfWidth - 20, (pdfWidth - 20) * (imgHeight / imgWidth));
+        heightLeft -= pdfHeight;
+        while (heightLeft > 0) {
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', imgX, heightLeft - scaledHeight, pdfWidth - 20, (pdfWidth - 20) * (imgHeight / imgWidth));
+          heightLeft -= pdfHeight;
+        }
+        pdf.save('document.pdf');
+      });
+    }
+  </script>
+</body>
+</html>
