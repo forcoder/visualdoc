@@ -5,129 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VisualDoc - 可视化文档工具</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+    .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     .template-card { transition: all 0.3s; cursor: pointer; }
-    .template-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
-    .template-card.active { ring: 2px; ring-offset: 2px; }
-    .preview-business h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 3px solid #1e3a5f; padding-bottom: 10px; color: #1e3a5f; }
-    .preview-business h2 { font-size: 22px; margin-top: 28px; margin-bottom: 14px; color: #2c5282; border-left: 4px solid #1e3a5f; padding-left: 12px; }
-    .preview-business h3 { font-size: 18px; margin-top: 22px; margin-bottom: 12px; color: #2d3748; }
-    .preview-business p { margin-bottom: 14px; line-height: 1.9; color: #4a5568; }
-    .preview-business ul, .preview-business ol { margin-bottom: 14px; padding-left: 28px; }
-    .preview-business li { margin-bottom: 8px; }
-    .preview-business code { background: #edf2f7; padding: 3px 8px; border-radius: 4px; font-family: monospace; color: #e53e3e; }
-    .preview-business pre { background: #1a202c; padding: 18px; border-radius: 8px; overflow-x: auto; margin-bottom: 18px; }
-    .preview-business pre code { background: none; color: #e2e8f0; padding: 0; }
-    .preview-business blockquote { border-left: 4px solid #1e3a5f; padding-left: 18px; margin-left: 0; margin-bottom: 18px; color: #718096; font-style: italic; background: #f7fafc; padding: 12px 18px; border-radius: 0 8px 8px 0; }
-    .preview-business table { width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .preview-business th, .preview-business td { border: 1px solid #e2e8f0; padding: 12px 16px; text-align: left; }
-    .preview-business th { background: #1e3a5f; color: white; font-weight: 600; }
+    .template-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+    .template-card.active { box-shadow: 0 0 0 3px #6366f1; transform: scale(1.05); }
+    .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); transition: all 0.3s; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(99,102,241,0.4); }
+    .preview-business h1 { font-size: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 4px solid #1e3a5f; color: #1e3a5f; font-weight: 700; }
+    .preview-business h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #2c5282; font-weight: 600; border-left: 5px solid #1e3a5f; padding-left: 16px; }
+    .preview-business h3 { font-size: 20px; margin-top: 24px; margin-bottom: 12px; color: #2d3748; font-weight: 600; }
+    .preview-business p { margin-bottom: 16px; line-height: 1.9; color: #4a5568; }
+    .preview-business table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .preview-business th { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; font-weight: 600; padding: 16px; }
+    .preview-business td { padding: 16px; border-bottom: 1px solid #e2e8f0; }
     .preview-business tr:nth-child(even) { background: #f7fafc; }
-    .preview-business tr:hover { background: #edf2f7; }
-    .preview-business hr { border: none; border-top: 2px solid #e2e8f0; margin: 28px 0; }
-    .preview-business strong { color: #1e3a5f; font-weight: 700; }
-    .preview-tech { background: #0d1117; color: #c9d1d9; padding: 40px; }
-    .preview-tech h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 2px solid #00d4aa; padding-bottom: 10px; color: #00d4aa; }
-    .preview-tech h2 { font-size: 22px; margin-top: 28px; margin-bottom: 14px; color: #58a6ff; }
-    .preview-tech h3 { font-size: 18px; margin-top: 22px; margin-bottom: 12px; color: #8b949e; }
-    .preview-tech p { margin-bottom: 14px; line-height: 1.9; color: #c9d1d9; }
-    .preview-tech ul, .preview-tech ol { margin-bottom: 14px; padding-left: 28px; }
-    .preview-tech li { margin-bottom: 8px; }
-    .preview-tech code { background: #21262d; padding: 3px 8px; border-radius: 4px; font-family: monospace; color: #ff7b72; }
-    .preview-tech pre { background: #161b22; padding: 18px; border-radius: 8px; overflow-x: auto; margin-bottom: 18px; border: 1px solid #30363d; }
-    .preview-tech pre code { background: none; color: #e6edf3; padding: 0; }
-    .preview-tech blockquote { border-left: 4px solid #00d4aa; padding-left: 18px; margin-left: 0; margin-bottom: 18px; color: #8b949e; font-style: italic; background: #161b22; padding: 12px 18px; border-radius: 0 8px 8px 0; }
-    .preview-tech table { width: 100%; border-collapse: collapse; margin-bottom: 18px; border: 1px solid #30363d; }
-    .preview-tech th, .preview-tech td { border: 1px solid #30363d; padding: 12px 16px; text-align: left; }
-    .preview-tech th { background: #21262d; color: #00d4aa; font-weight: 600; }
-    .preview-tech tr:nth-child(even) { background: #161b22; }
-    .preview-tech hr { border: none; border-top: 1px solid #30363d; margin: 28px 0; }
-    .preview-tech strong { color: #00d4aa; font-weight: 700; }
-    .preview-nature h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 3px solid #38a169; padding-bottom: 10px; color: #22543d; }
-    .preview-nature h2 { font-size: 22px; margin-top: 28px; margin-bottom: 14px; color: #276749; border-left: 4px solid #48bb78; padding-left: 12px; }
-    .preview-nature h3 { font-size: 18px; margin-top: 22px; margin-bottom: 12px; color: #2f855a; }
-    .preview-nature p { margin-bottom: 14px; line-height: 1.9; color: #4a5568; }
-    .preview-nature ul, .preview-nature ol { margin-bottom: 14px; padding-left: 28px; }
-    .preview-nature li { margin-bottom: 8px; }
-    .preview-nature code { background: #f0fff4; padding: 3px 8px; border-radius: 4px; font-family: monospace; color: #c53030; }
-    .preview-nature pre { background: #2d3748; padding: 18px; border-radius: 8px; overflow-x: auto; margin-bottom: 18px; }
-    .preview-nature pre code { background: none; color: #e2e8f0; padding: 0; }
-    .preview-nature blockquote { border-left: 4px solid #48bb78; padding-left: 18px; margin-left: 0; margin-bottom: 18px; color: #718096; font-style: italic; background: #f0fff4; padding: 12px 18px; border-radius: 0 8px 8px 0; }
-    .preview-nature table { width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .preview-nature th, .preview-nature td { border: 1px solid #c6f6d5; padding: 12px 16px; text-align: left; }
-    .preview-nature th { background: #38a169; color: white; font-weight: 600; }
-    .preview-nature tr:nth-child(even) { background: #f0fff4; }
-    .preview-nature hr { border: none; border-top: 2px solid #c6f6d5; margin: 28px 0; }
-    .preview-nature strong { color: #22543d; font-weight: 700; }
-    .preview-warm h1 { font-size: 28px; margin-bottom: 16px; border-bottom: 3px solid #dd6b20; padding-bottom: 10px; color: #c05621; }
-    .preview-warm h2 { font-size: 22px; margin-top: 28px; margin-bottom: 14px; color: #9c4221; border-left: 4px solid #ed8936; padding-left: 12px; }
-    .preview-warm h3 { font-size: 18px; margin-top: 22px; margin-bottom: 12px; color: #7b341e; }
-    .preview-warm p { margin-bottom: 14px; line-height: 1.9; color: #4a5568; }
-    .preview-warm ul, .preview-warm ol { margin-bottom: 14px; padding-left: 28px; }
-    .preview-warm li { margin-bottom: 8px; }
-    .preview-warm code { background: #fffaf0; padding: 3px 8px; border-radius: 4px; font-family: monospace; color: #c53030; }
-    .preview-warm pre { background: #2d3748; padding: 18px; border-radius: 8px; overflow-x: auto; margin-bottom: 18px; }
-    .preview-warm pre code { background: none; color: #e2e8f0; padding: 0; }
-    .preview-warm blockquote { border-left: 4px solid #ed8936; padding-left: 18px; margin-left: 0; margin-bottom: 18px; color: #718096; font-style: italic; background: #fffaf0; padding: 12px 18px; border-radius: 0 8px 8px 0; }
-    .preview-warm table { width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .preview-warm th, .preview-warm td { border: 1px solid #feebc8; padding: 12px 16px; text-align: left; }
-    .preview-warm th { background: #dd6b20; color: white; font-weight: 600; }
-    .preview-warm tr:nth-child(even) { background: #fffaf0; }
-    .preview-warm hr { border: none; border-top: 2px solid #feebc8; margin: 28px 0; }
-    .preview-warm strong { color: #c05621; font-weight: 700; }
-    .preview-minimal h1 { font-size: 32px; margin-bottom: 20px; padding-bottom: 12px; color: #1a202c; font-weight: 300; letter-spacing: -0.5px; }
-    .preview-minimal h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #2d3748; font-weight: 400; }
-    .preview-minimal h3 { font-size: 20px; margin-top: 24px; margin-bottom: 14px; color: #4a5568; font-weight: 500; }
-    .preview-minimal p { margin-bottom: 16px; line-height: 2; color: #4a5568; }
-    .preview-minimal ul, .preview-minimal ol { margin-bottom: 16px; padding-left: 32px; }
-    .preview-minimal li { margin-bottom: 10px; }
-    .preview-minimal code { background: #f7fafc; padding: 4px 10px; border-radius: 4px; font-family: monospace; color: #e53e3e; border: 1px solid #e2e8f0; }
-    .preview-minimal pre { background: #1a202c; padding: 20px; border-radius: 8px; overflow-x: auto; margin-bottom: 20px; }
-    .preview-minimal pre code { background: none; color: #e2e8f0; padding: 0; border: none; }
-    .preview-minimal blockquote { border-left: 3px solid #cbd5e0; padding-left: 20px; margin-left: 0; margin-bottom: 20px; color: #718096; font-style: italic; }
-    .preview-minimal table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    .preview-minimal th, .preview-minimal td { border: 1px solid #e2e8f0; padding: 14px 18px; text-align: left; }
-    .preview-minimal th { background: #f7fafc; color: #2d3748; font-weight: 600; }
-    .preview-minimal tr:nth-child(even) { background: #fafafa; }
-    .preview-minimal hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
-    .preview-minimal strong { color: #1a202c; font-weight: 600; }
+    .preview-tech { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); color: #c9d1d9; }
+    .preview-tech h1 { font-size: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 3px solid #00d4aa; color: #00d4aa; font-weight: 700; }
+    .preview-tech h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #58a6ff; font-weight: 600; }
+    .preview-tech th { background: rgba(33,38,45,0.8); color: #00d4aa; font-weight: 600; padding: 16px; }
+    .preview-nature h1 { font-size: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 4px solid #38a169; color: #22543d; font-weight: 700; }
+    .preview-nature h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #276749; font-weight: 600; border-left: 5px solid #48bb78; padding-left: 16px; }
+    .preview-nature th { background: linear-gradient(135deg, #38a169 0%, #48bb78 100%); color: white; font-weight: 600; padding: 16px; }
+    .preview-warm h1 { font-size: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 4px solid #dd6b20; color: #c05621; font-weight: 700; }
+    .preview-warm h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #9c4221; font-weight: 600; border-left: 5px solid #ed8936; padding-left: 16px; }
+    .preview-warm th { background: linear-gradient(135deg, #dd6b20 0%, #ed8936 100%); color: white; font-weight: 600; padding: 16px; }
+    .preview-minimal h1 { font-size: 36px; margin-bottom: 28px; padding-bottom: 20px; color: #1a202c; font-weight: 300; letter-spacing: -1px; border-bottom: 1px solid #e2e8f0; }
+    .preview-minimal h2 { font-size: 28px; margin-top: 40px; margin-bottom: 20px; color: #2d3748; font-weight: 400; }
+    .preview-minimal th { background: #f7fafc; color: #2d3748; font-weight: 600; padding: 18px; border-bottom: 2px solid #e2e8f0; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
   </style>
 </head>
-<body class="h-screen flex flex-col">
-  <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg">
-    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span class="text-2xl">🎨</span>
-        <h1 class="text-xl font-bold">VisualDoc</h1>
+<body class="min-h-screen">
+  <!-- 顶部导航 -->
+  <header class="glass sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-lg">🎨</div>
+          <div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">VisualDoc</h1>
+            <p class="text-xs text-gray-500">可视化文档工具</p>
+          </div>
+        </div>
+        <nav class="flex gap-1 bg-gray-100/50 p-1 rounded-xl">
+          <button onclick="switchTab('visual')" id="tab-visual" class="px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 bg-white text-indigo-600 shadow-sm">
+            <i class="fas fa-project-diagram"></i><span>文本转可视化</span>
+          </button>
+          <button onclick="switchTab('markdown')" id="tab-markdown" class="px-6 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2">
+            <i class="fas fa-file-pdf"></i><span>Markdown转PDF</span>
+          </button>
+        </nav>
+        <a href="https://github.com/forcoder/visualdoc" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
+          <i class="fab fa-github text-lg"></i><span class="text-sm font-medium">GitHub</span>
+        </a>
       </div>
-      <nav class="flex gap-2">
-        <button onclick="switchTab('visual')" id="tab-visual" class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">🎨 文本转可视化</button>
-        <button onclick="switchTab('markdown')" id="tab-markdown" class="px-4 py-2 rounded-lg hover:bg-white/20 transition font-medium">📄 Markdown转PDF</button>
-      </nav>
-      <a href="https://github.com/forcoder/visualdoc" target="_blank" class="text-sm opacity-80 hover:opacity-100">GitHub</a>
     </div>
   </header>
 
-  <main class="flex-1 container mx-auto px-6 py-6 overflow-hidden">
-    <div id="content-visual" class="tab-content active h-full">
-      <div class="bg-white rounded-xl shadow-md h-full flex flex-col">
-        <div class="flex gap-3 p-4 border-b bg-gray-50">
-          <button onclick="generateDiagram()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">✨ 生成图表</button>
-          <button onclick="exportVisualPNG()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">导出 PNG</button>
-          <button onclick="exportVisualPDF()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">导出 PDF</button>
+  <main class="container mx-auto px-6 py-8">
+    <!-- 文本转可视化 -->
+    <div id="content-visual" class="tab-content active">
+      <div class="glass rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 p-4">
+          <div class="flex items-center gap-4">
+            <button onclick="generateDiagram()" class="btn-primary px-6 py-2.5 rounded-xl text-white font-medium flex items-center gap-2 shadow-lg">
+              <i class="fas fa-magic"></i><span>生成图表</span>
+            </button>
+            <div class="h-6 w-px bg-gray-300"></div>
+            <button onclick="exportVisualPNG()" class="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+              <i class="fas fa-image text-green-500"></i><span>导出 PNG</span>
+            </button>
+            <button onclick="exportVisualPDF()" class="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+              <i class="fas fa-file-pdf text-red-500"></i><span>导出 PDF</span>
+            </button>
+          </div>
         </div>
-        <div class="flex flex-1">
-          <div class="w-1/2 border-r flex flex-col">
-            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">📝 文本输入</div>
-            <textarea id="visual-input" class="flex-1 p-4 font-mono text-sm resize-none focus:outline-none" placeholder="输入文本内容，点击生成图表..."># 项目流程
+        <div class="flex h-[calc(100vh-280px)]">
+          <div class="w-1/2 border-r border-gray-200 flex flex-col">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+              <i class="fas fa-code text-gray-400"></i>
+              <span class="text-sm font-medium text-gray-700">文本输入</span>
+              <span class="ml-auto text-xs text-gray-400">支持 Markdown 格式</span>
+            </div>
+            <textarea id="visual-input" class="flex-1 p-6 font-mono text-sm resize-none focus:outline-none bg-white/50" placeholder="输入文本内容，点击生成图表..."># 项目流程
 
 ## 1. 需求分析
 - 收集用户需求
@@ -145,13 +119,16 @@
 - 功能测试
 - 正式发布</textarea>
           </div>
-          <div class="w-1/2 flex flex-col">
-            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700">👁️ 可视化预览</div>
-            <div id="visual-preview" class="flex-1 p-4 overflow-auto flex items-center justify-center bg-white">
+          <div class="w-1/2 flex flex-col bg-gray-50/50">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+              <i class="fas fa-eye text-gray-400"></i>
+              <span class="text-sm font-medium text-gray-700">可视化预览</span>
+            </div>
+            <div id="visual-preview" class="flex-1 p-6 overflow-auto flex items-center justify-center">
               <div class="text-center text-gray-400">
-                <div class="text-6xl mb-4">🎨</div>
-                <p>点击"生成图表"按钮</p>
-                <p>将文本转换为可视化图表</p>
+                <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-5xl mb-6 mx-auto">🎨</div>
+                <p class="text-lg font-medium text-gray-600 mb-2">点击"生成图表"按钮</p>
+                <p class="text-sm text-gray-400">将文本转换为可视化图表</p>
               </div>
             </div>
           </div>
@@ -159,44 +136,69 @@
       </div>
     </div>
 
-    <div id="content-markdown" class="tab-content h-full">
-      <div class="bg-white rounded-xl shadow-md h-full flex flex-col">
-        <div class="p-4 border-b bg-gray-50">
-          <div class="flex items-center gap-4 mb-3">
-            <span class="text-sm font-medium text-gray-700">📐 PDF 模板：</span>
+    <!-- Markdown转PDF -->
+    <div id="content-markdown" class="tab-content">
+      <div class="glass rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 p-5">
+          <div class="flex items-center gap-4 mb-5">
+            <span class="text-sm font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-palette text-indigo-500"></i>PDF 模板</span>
             <div class="flex gap-3" id="template-selector">
-              <div onclick="selectTemplate('business')" class="template-card active px-4 py-2 rounded-lg border-2 border-blue-600 bg-blue-50 text-sm font-medium" data-template="business">💼 商务蓝</div>
-              <div onclick="selectTemplate('tech')" class="template-card px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-gray-400 text-sm font-medium" data-template="tech">💻 科技黑</div>
-              <div onclick="selectTemplate('nature')" class="template-card px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-gray-400 text-sm font-medium" data-template="nature">🌿 清新绿</div>
-              <div onclick="selectTemplate('warm')" class="template-card px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-gray-400 text-sm font-medium" data-template="warm">🧡 暖色橙</div>
-              <div onclick="selectTemplate('minimal')" class="template-card px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-gray-400 text-sm font-medium" data-template="minimal">⚪ 极简白</div>
+              <div onclick="selectTemplate('business')" class="template-card active w-28 h-20 rounded-xl border-2 border-indigo-500 bg-gradient-to-br from-blue-50 to-indigo-50 flex flex-col items-center justify-center gap-1 shadow-md" data-template="business">
+                <span class="text-2xl">💼</span><span class="text-xs font-semibold text-gray-700">商务蓝</span>
+              </div>
+              <div onclick="selectTemplate('tech')" class="template-card w-28 h-20 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center gap-1 hover:border-gray-400" data-template="tech">
+                <span class="text-2xl">💻</span><span class="text-xs font-semibold text-gray-300">科技黑</span>
+              </div>
+              <div onclick="selectTemplate('nature')" class="template-card w-28 h-20 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-green-50 to-emerald-50 flex flex-col items-center justify-center gap-1 hover:border-green-400" data-template="nature">
+                <span class="text-2xl">🌿</span><span class="text-xs font-semibold text-gray-700">清新绿</span>
+              </div>
+              <div onclick="selectTemplate('warm')" class="template-card w-28 h-20 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-orange-50 to-amber-50 flex flex-col items-center justify-center gap-1 hover:border-orange-400" data-template="warm">
+                <span class="text-2xl">🧡</span><span class="text-xs font-semibold text-gray-700">暖色橙</span>
+              </div>
+              <div onclick="selectTemplate('minimal')" class="template-card w-28 h-20 rounded-xl border-2 border-gray-200 bg-white flex flex-col items-center justify-center gap-1 hover:border-gray-400" data-template="minimal">
+                <span class="text-2xl">⚪</span><span class="text-xs font-semibold text-gray-700">极简白</span>
+              </div>
             </div>
           </div>
           <div class="flex items-center gap-4">
-            <span class="text-sm font-medium text-gray-700">📚 行业范例：</span>
-            <select onchange="loadIndustryExample(this.value)" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="">选择行业模板...</option>
-              <optgroup label="💼 商业类">
-                <option value="business-plan">商业计划书</option>
-                <option value="project-proposal">项目提案</option>
-                <option value="meeting-minutes">会议纪要</option>
-              </optgroup>
-              <optgroup label="💻 技术类">
-                <option value="prd">产品需求文档(PRD)</option>
-                <option value="tech-spec">技术方案文档</option>
-              </optgroup>
-            </select>
-            <button onclick="clearMarkdown()" class="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800">🗑️ 清空</button>
-            <button onclick="exportMarkdownPDF()" class="ml-auto px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium">⬇️ 导出 PDF</button>
+            <span class="text-sm font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-book text-indigo-500"></i>行业范例</span>
+            <div class="relative">
+              <select onchange="loadIndustryExample(this.value)" class="appearance-none pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shadow-sm">
+                <option value="">选择模板...</option>
+                <optgroup label="💼 商业类">
+                  <option value="business-plan">商业计划书</option>
+                  <option value="project-proposal">项目提案</option>
+                  <option value="meeting-minutes">会议纪要</option>
+                </optgroup>
+                <optgroup label="💻 技术类">
+                  <option value="prd">产品需求文档</option>
+                  <option value="tech-spec">技术方案</option>
+                </optgroup>
+                <optgroup label="🎓 教育类">
+                  <option value="syllabus">教学大纲</option>
+                  <option value="experiment-report">实验报告</option>
+                </optgroup>
+              </select>
+              <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+            </div>
+            <button onclick="clearMarkdown()" class="px-4 py-2.5 rounded-xl text-gray-600 hover:text-red-600 hover:bg-red-50 transition-all flex items-center gap-2 text-sm font-medium">
+              <i class="fas fa-trash-alt"></i>清空
+            </button>
+            <button onclick="exportMarkdownPDF()" class="ml-auto btn-primary px-6 py-2.5 rounded-xl text-white font-medium flex items-center gap-2 shadow-lg">
+              <i class="fas fa-download"></i><span>导出 PDF</span>
+            </button>
           </div>
         </div>
-        <div class="flex flex-1">
-          <div class="w-1/2 border-r flex flex-col">
-            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700 flex justify-between items-center">
-              <span>📝 Markdown 编辑</span>
-              <span class="text-xs text-gray-500">支持标准 Markdown 语法</span>
+        <div class="flex h-[calc(100vh-340px)]">
+          <div class="w-1/2 border-r border-gray-200 flex flex-col">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-edit text-gray-400"></i>
+                <span class="text-sm font-medium text-gray-700">Markdown 编辑</span>
+              </div>
+              <span class="text-xs text-gray-400">支持标准 Markdown 语法</span>
             </div>
-            <textarea id="markdown-input" class="flex-1 p-4 font-mono text-sm resize-none focus:outline-none bg-gray-50" placeholder="在此输入 Markdown 内容，或选择上方行业范例..."># 欢迎使用 VisualDoc
+            <textarea id="markdown-input" class="flex-1 p-6 font-mono text-sm resize-none focus:outline-none bg-white/50" placeholder="在此输入 Markdown 内容，或选择上方行业范例..."># 欢迎使用 VisualDoc
 
 ## 专业的 PDF 文档生成工具
 
@@ -224,12 +226,15 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
 > 🦞 由小龙、小小、小优、小测团队精心打造</textarea>
           </div>
           <div class="w-1/2 flex flex-col">
-            <div class="px-4 py-2 bg-gray-100 border-b text-sm font-medium text-gray-700 flex justify-between items-center">
-              <span>👁️ 实时预览</span>
-              <span id="current-template-name" class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">💼 商务蓝</span>
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-eye text-gray-400"></i>
+                <span class="text-sm font-medium text-gray-700">实时预览</span>
+              </div>
+              <span id="current-template-name" class="text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full font-medium">💼 商务蓝</span>
             </div>
             <div class="flex-1 overflow-auto bg-white">
-              <div id="markdown-preview" class="preview-business p-8 max-w-3xl mx-auto"></div>
+              <div id="markdown-preview" class="preview-business p-8 max-w-3xl mx-auto min-h-full"></div>
             </div>
           </div>
         </div>
@@ -237,8 +242,8 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
     </div>
   </main>
 
-  <footer class="bg-gray-100 border-t py-3 text-center text-sm text-gray-500">
-    🦞 由小龙、小小、小优、小测团队打造 | VisualDoc 2026
+  <footer class="glass mt-8 py-4 text-center text-sm text-gray-600">
+    <p>🦞 由小龙、小小、小优、小测团队打造 | VisualDoc 2026</p>
   </footer>
 
   <script>
@@ -249,11 +254,11 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.getElementById('content-' + tab).classList.add('active');
       document.querySelectorAll('nav button').forEach(el => {
-        el.classList.remove('bg-white/20');
-        el.classList.add('hover:bg-white/20');
+        el.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+        el.classList.add('text-gray-600');
       });
-      document.getElementById('tab-' + tab).classList.add('bg-white/20');
-      document.getElementById('tab-' + tab).classList.remove('hover:bg-white/20');
+      document.getElementById('tab-' + tab).classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+      document.getElementById('tab-' + tab).classList.remove('text-gray-600');
     }
 
     function generateDiagram() {
@@ -318,13 +323,13 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
     function selectTemplate(template) {
       currentTemplate = template;
       document.querySelectorAll('.template-card').forEach(card => {
-        card.classList.remove('active', 'border-blue-600', 'bg-blue-50');
+        card.classList.remove('active', 'border-indigo-500');
         card.classList.add('border-gray-200');
       });
-      document.querySelector(`[data-template="${template}"]`).classList.add('active', 'border-blue-600', 'bg-blue-50');
+      document.querySelector(`[data-template="${template}"]`).classList.add('active', 'border-indigo-500');
       document.querySelector(`[data-template="${template}"]`).classList.remove('border-gray-200');
       const preview = document.getElementById('markdown-preview');
-      preview.className = `preview-${template} p-8 max-w-3xl mx-auto`;
+      preview.className = `preview-${template} p-8 max-w-3xl mx-auto min-h-full`;
       const templateNames = { 'business': '💼 商务蓝', 'tech': '💻 科技黑', 'nature': '🌿 清新绿', 'warm': '🧡 暖色橙', 'minimal': '⚪ 极简白' };
       document.getElementById('current-template-name').textContent = templateNames[template];
       updateMarkdownPreview();
@@ -377,7 +382,6 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
       });
     }
 
-    // 初始化预览
     updateMarkdownPreview();
   </script>
 </body>
