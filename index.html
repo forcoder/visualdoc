@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="ai-manager.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -310,6 +311,12 @@
           </button>
         </div>
         
+        <!-- AI Config -->
+        <button onclick="toggleAIConfig()" class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-all mr-2">
+          <i class="fas fa-robot text-lg"></i>
+          <span>AI配置</span>
+        </button>
+        
         <!-- GitHub -->
         <a href="https://github.com/forcoder/visualdoc" target="_blank" 
            class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
@@ -320,6 +327,90 @@
   </header>
 
   <!-- Main Content -->
+  <!-- AI Config Panel -->
+  <div id="ai-config-panel" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="toggleAIConfig()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-96 bg-white shadow-2xl overflow-y-auto">
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold">🤖 AI 模型配置</h2>
+          <button onclick="toggleAIConfig()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <i class="fas fa-times text-gray-500"></i>
+          </button>
+        </div>
+        <p class="text-sm text-gray-500 mt-1">配置多个免费模型，自动切换使用</p>
+      </div>
+      
+      <div class="p-6 space-y-4">
+        <!-- 硅基流动 -->
+        <div class="border border-gray-200 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-medium text-sm">硅基流动</span>
+            <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">推荐</span>
+          </div>
+          <input type="password" id="apikey-siliconflow" placeholder="输入 API Key" 
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onchange="saveApiKey('siliconflow', this.value)">
+          <p class="text-xs text-gray-400 mt-1">注册: siliconflow.cn</p>
+        </div>
+        
+        <!-- DeepSeek -->
+        <div class="border border-gray-200 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-medium text-sm">DeepSeek</span>
+          </div>
+          <input type="password" id="apikey-deepseek" placeholder="输入 API Key" 
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onchange="saveApiKey('deepseek', this.value)">
+          <p class="text-xs text-gray-400 mt-1">注册: platform.deepseek.com</p>
+        </div>
+        
+        <!-- 智谱GLM -->
+        <div class="border border-gray-200 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-medium text-sm">智谱 GLM</span>
+          </div>
+          <input type="password" id="apikey-zhipu" placeholder="输入 API Key" 
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onchange="saveApiKey('zhipu', this.value)">
+          <p class="text-xs text-gray-400 mt-1">注册: open.bigmodel.cn</p>
+        </div>
+        
+        <!-- 百度千帆 -->
+        <div class="border border-gray-200 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-medium text-sm">百度千帆</span>
+          </div>
+          <input type="password" id="apikey-baidu" placeholder="输入 API Key" 
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onchange="saveApiKey('baidu', this.value)">
+          <p class="text-xs text-gray-400 mt-1">注册: qianfan.baidu.com</p>
+        </div>
+        
+        <!-- 阿里通义 -->
+        <div class="border border-gray-200 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-medium text-sm">阿里通义</span>
+          </div>
+          <input type="password" id="apikey-aliyun" placeholder="输入 API Key" 
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onchange="saveApiKey('aliyun', this.value)">
+          <p class="text-xs text-gray-400 mt-1">注册: dashscope.aliyun.com</p>
+        </div>
+      </div>
+      
+      <div class="p-6 border-t border-gray-100 bg-gray-50">
+        <button onclick="testAIConnection()" class="w-full py-2.5 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors">
+          <i class="fas fa-plug mr-2"></i>测试连接
+        </button>
+        <p class="text-xs text-gray-500 mt-3 text-center">
+          配置多个模型后，系统会自动切换使用<br>
+          当一个模型 Token 用完时自动切换到下一个
+        </p>
+      </div>
+    </div>
+  </div>
+
   <main class="pt-24 pb-12 px-6">
     <div class="max-w-7xl mx-auto">
       
@@ -387,6 +478,41 @@ UI设计，原型制作
       <!-- Markdown Tab -->
       <div id="content-markdown" class="tab-content">
         <div class="apple-card overflow-hidden">
+          <!-- AI Assistant -->
+          <div class="border-b border-gray-100 px-6 py-4 bg-gradient-to-r from-purple-50/50 to-blue-50/50">
+            <div class="flex items-center gap-4">
+              <span class="text-xs font-semibold text-purple-600 uppercase tracking-wide">🤖 AI 助手</span>
+              <div class="flex-1 flex items-center gap-3">
+                <input type="text" id="ai-prompt" placeholder="输入主题，让 AI 生成文档..." 
+                  class="flex-1 px-4 py-2 bg-white border border-purple-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <select id="ai-type" class="px-3 py-2 bg-white border border-purple-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                  <option value="general">通用</option>
+                  <option value="business">商业</option>
+                  <option value="technical">技术</option>
+                  <option value="meeting">会议</option>
+                </select>
+                <button onclick="generateWithAI()" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all">
+                  <i class="fas fa-wand-magic-sparkles mr-1"></i>生成
+                </button>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="improveWithAI('polish')" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:border-purple-300 hover:text-purple-600 transition-all">
+                  ✨ 润色
+                </button>
+                <button onclick="improveWithAI('expand')" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:border-purple-300 hover:text-purple-600 transition-all">
+                  📝 扩写
+                </button>
+                <button onclick="improveWithAI('simplify')" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:border-purple-300 hover:text-purple-600 transition-all">
+                  🎯 简化
+                </button>
+              </div>
+            </div>
+            <div id="ai-status" class="hidden mt-3 flex items-center gap-2 text-sm text-purple-600">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>AI 正在生成中...</span>
+            </div>
+          </div>
+          
           <!-- Templates -->
           <div class="border-b border-gray-100 px-6 py-5">
             <div class="flex items-start gap-6">
@@ -659,6 +785,117 @@ VisualDoc 是一款优雅的文档工具，帮助您快速创建精美的 PDF �
     }
 
     updateMarkdownPreview();
+    
+    // ===== AI Functions =====
+    function toggleAIConfig() {
+      const panel = document.getElementById('ai-config-panel');
+      panel.classList.toggle('hidden');
+      
+      // Load saved API keys
+      if (!panel.classList.contains('hidden')) {
+        const savedKeys = JSON.parse(localStorage.getItem('ai-api-keys') || '{}');
+        Object.keys(savedKeys).forEach(modelId => {
+          const input = document.getElementById(`apikey-${modelId}`);
+          if (input) input.value = savedKeys[modelId];
+          if (window.aiManager) window.aiManager.setApiKey(modelId, savedKeys[modelId]);
+        });
+      }
+    }
+    
+    function saveApiKey(modelId, apiKey) {
+      const savedKeys = JSON.parse(localStorage.getItem('ai-api-keys') || '{}');
+      savedKeys[modelId] = apiKey;
+      localStorage.setItem('ai-api-keys', JSON.stringify(savedKeys));
+      if (window.aiManager) window.aiManager.setApiKey(modelId, apiKey);
+      console.log(`[AI] ${modelId} API Key 已保存`);
+    }
+    
+    async function generateWithAI() {
+      const prompt = document.getElementById('ai-prompt').value.trim();
+      const type = document.getElementById('ai-type').value;
+      
+      if (!prompt) {
+        alert('请输入主题');
+        return;
+      }
+      
+      if (!window.aiManager) {
+        alert('AI 管理器未加载，请刷新页面');
+        return;
+      }
+      
+      const status = document.getElementById('ai-status');
+      status.classList.remove('hidden');
+      
+      try {
+        const result = await window.aiManager.generateDocument(prompt, type);
+        if (result.success) {
+          document.getElementById('markdown-input').value = result.data;
+          updateMarkdownPreview();
+          document.getElementById('ai-prompt').value = '';
+          alert(`✅ 文档生成成功！使用模型: ${result.model}`);
+        }
+      } catch (error) {
+        alert('❌ 生成失败: ' + error.message);
+      } finally {
+        status.classList.add('hidden');
+      }
+    }
+    
+    async function improveWithAI(action) {
+      const content = document.getElementById('markdown-input').value;
+      if (!content.trim()) {
+        alert('请先输入内容');
+        return;
+      }
+      
+      if (!window.aiManager) {
+        alert('AI 管理器未加载');
+        return;
+      }
+      
+      const status = document.getElementById('ai-status');
+      status.classList.remove('hidden');
+      status.querySelector('span').textContent = 'AI 正在优化中...';
+      
+      try {
+        const result = await window.aiManager.improveDocument(content, action);
+        if (result.success) {
+          document.getElementById('markdown-input').value = result.data;
+          updateMarkdownPreview();
+          alert(`✅ 优化完成！使用模型: ${result.model}`);
+        }
+      } catch (error) {
+        alert('❌ 优化失败: ' + error.message);
+      } finally {
+        status.classList.add('hidden');
+        status.querySelector('span').textContent = 'AI 正在生成中...';
+      }
+    }
+    
+    async function testAIConnection() {
+      if (!window.aiManager) {
+        alert('AI 管理器未加载');
+        return;
+      }
+      
+      const availableModels = window.aiManager.getAvailableModels();
+      if (availableModels.length === 0) {
+        alert('❌ 没有配置任何模型，请先输入 API Key');
+        return;
+      }
+      
+      alert(`✅ 已配置 ${availableModels.length} 个模型:\n${availableModels.map(m => '• ' + m.name).join('\n')}\n\n系统会自动切换使用这些模型。`);
+    }
+    
+    // Load saved API keys on page load
+    window.addEventListener('load', () => {
+      const savedKeys = JSON.parse(localStorage.getItem('ai-api-keys') || '{}');
+      Object.keys(savedKeys).forEach(modelId => {
+        if (window.aiManager) window.aiManager.setApiKey(modelId, savedKeys[modelId]);
+      });
+      console.log('[AI] 已加载保存的 API Keys');
+    });
   </script>
 </body>
 </html>
