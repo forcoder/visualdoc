@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VisualDoc - 可视化文档工具</title>
+  <title>VisualDoc - Beautiful Document Tools</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -13,238 +13,479 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-    .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
+    :root {
+      --apple-bg: #f5f5f7;
+      --apple-card: #ffffff;
+      --apple-text: #1d1d1f;
+      --apple-gray: #86868b;
+      --apple-blue: #0071e3;
+      --apple-blue-hover: #0077ed;
+      --apple-border: #d2d2d7;
+    }
+    body { 
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; 
+      background: var(--apple-bg);
+      color: var(--apple-text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Apple-style card */
+    .apple-card {
+      background: var(--apple-card);
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    
+    /* Apple-style button */
+    .apple-btn {
+      background: var(--apple-blue);
+      color: white;
+      border-radius: 980px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      cursor: pointer;
+    }
+    .apple-btn:hover {
+      background: var(--apple-blue-hover);
+      transform: scale(1.02);
+    }
+    .apple-btn-secondary {
+      background: rgba(0,0,0,0.05);
+      color: var(--apple-text);
+    }
+    .apple-btn-secondary:hover {
+      background: rgba(0,0,0,0.08);
+    }
+    
+    /* Apple-style input */
+    .apple-input {
+      background: rgba(0,0,0,0.02);
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .apple-input:focus {
+      background: white;
+      border-color: var(--apple-blue);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
+    }
+    
+    /* Apple-style segmented control */
+    .segmented-control {
+      background: rgba(0,0,0,0.04);
+      border-radius: 10px;
+      padding: 4px;
+      display: inline-flex;
+    }
+    .segmented-btn {
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--apple-gray);
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    .segmented-btn.active {
+      background: white;
+      color: var(--apple-text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    /* Template cards */
+    .template-card {
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid transparent;
+    }
+    .template-card:hover {
+      transform: translateY(-2px);
+    }
+    .template-card.active {
+      border-color: var(--apple-blue);
+      box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
+    }
+    
+    /* Tab content */
     .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .template-card { transition: all 0.3s; cursor: pointer; }
-    .template-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-    .template-card.active { box-shadow: 0 0 0 3px #6366f1; transform: scale(1.05); }
-    .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); transition: all 0.3s; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(99,102,241,0.4); }
-    .preview-business h1 { font-size: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 4px solid #1e3a5f; color: #1e3a5f; font-weight: 700; }
-    .preview-business h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #2c5282; font-weight: 600; border-left: 5px solid #1e3a5f; padding-left: 16px; }
-    .preview-business h3 { font-size: 20px; margin-top: 24px; margin-bottom: 12px; color: #2d3748; font-weight: 600; }
-    .preview-business p { margin-bottom: 16px; line-height: 1.9; color: #4a5568; }
-    .preview-business table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .preview-business th { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; font-weight: 600; padding: 16px; }
-    .preview-business td { padding: 16px; border-bottom: 1px solid #e2e8f0; }
-    .preview-business tr:nth-child(even) { background: #f7fafc; }
-    .preview-tech { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); color: #c9d1d9; }
-    .preview-tech h1 { font-size: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 3px solid #00d4aa; color: #00d4aa; font-weight: 700; }
-    .preview-tech h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #58a6ff; font-weight: 600; }
-    .preview-tech th { background: rgba(33,38,45,0.8); color: #00d4aa; font-weight: 600; padding: 16px; }
-    .preview-nature h1 { font-size: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 4px solid #38a169; color: #22543d; font-weight: 700; }
-    .preview-nature h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #276749; font-weight: 600; border-left: 5px solid #48bb78; padding-left: 16px; }
-    .preview-nature th { background: linear-gradient(135deg, #38a169 0%, #48bb78 100%); color: white; font-weight: 600; padding: 16px; }
-    .preview-warm h1 { font-size: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 4px solid #dd6b20; color: #c05621; font-weight: 700; }
-    .preview-warm h2 { font-size: 24px; margin-top: 32px; margin-bottom: 16px; color: #9c4221; font-weight: 600; border-left: 5px solid #ed8936; padding-left: 16px; }
-    .preview-warm th { background: linear-gradient(135deg, #dd6b20 0%, #ed8936 100%); color: white; font-weight: 600; padding: 16px; }
-    .preview-minimal h1 { font-size: 36px; margin-bottom: 28px; padding-bottom: 20px; color: #1a202c; font-weight: 300; letter-spacing: -1px; border-bottom: 1px solid #e2e8f0; }
-    .preview-minimal h2 { font-size: 28px; margin-top: 40px; margin-bottom: 20px; color: #2d3748; font-weight: 400; }
-    .preview-minimal th { background: #f7fafc; color: #2d3748; font-weight: 600; padding: 18px; border-bottom: 2px solid #e2e8f0; }
+    .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+    
+    /* Preview styles - Business */
+    .preview-business { background: white; }
+    .preview-business h1 { 
+      font-size: 36px; font-weight: 700; 
+      margin-bottom: 24px; padding-bottom: 16px;
+      border-bottom: 1px solid #e5e5e7;
+      color: #1d1d1f; letter-spacing: -0.02em;
+    }
+    .preview-business h2 { 
+      font-size: 26px; font-weight: 600; 
+      margin-top: 36px; margin-bottom: 16px;
+      color: #1d1d1f; letter-spacing: -0.01em;
+    }
+    .preview-business h3 { 
+      font-size: 21px; font-weight: 600; 
+      margin-top: 28px; margin-bottom: 12px;
+      color: #1d1d1f;
+    }
+    .preview-business p { 
+      font-size: 17px; line-height: 1.6; 
+      margin-bottom: 16px; color: #333;
+    }
+    .preview-business ul, .preview-business ol { 
+      margin-bottom: 16px; padding-left: 28px;
+    }
+    .preview-business li { margin-bottom: 8px; font-size: 17px; }
+    .preview-business code { 
+      background: #f5f5f7; padding: 4px 10px; 
+      border-radius: 6px; font-family: 'SF Mono', monospace;
+      font-size: 14px; color: #ff3b30;
+    }
+    .preview-business pre { 
+      background: #1d1d1f; padding: 24px; 
+      border-radius: 12px; overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    .preview-business pre code { 
+      background: none; color: #f5f5f7; padding: 0;
+    }
+    .preview-business blockquote { 
+      border-left: 4px solid #0071e3; 
+      padding: 16px 24px; margin: 24px 0;
+      background: #f5f5f7; border-radius: 0 12px 12px 0;
+      color: #333;
+    }
+    .preview-business table { 
+      width: 100%; border-collapse: separate;
+      border-spacing: 0; margin-bottom: 24px;
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .preview-business th { 
+      background: #1d1d1f; color: white;
+      padding: 16px; font-weight: 600; font-size: 14px;
+    }
+    .preview-business td { 
+      padding: 16px; border-bottom: 1px solid #e5e5e7;
+      font-size: 15px;
+    }
+    .preview-business tr:last-child td { border-bottom: none; }
+    .preview-business tr:nth-child(even) { background: #fafafa; }
+    .preview-business hr { 
+      border: none; height: 1px; 
+      background: #e5e5e7; margin: 32px 0;
+    }
+    .preview-business strong { font-weight: 600; }
+    
+    /* Preview - Tech Dark */
+    .preview-tech { 
+      background: #000; color: #f5f5f7;
+    }
+    .preview-tech h1 { 
+      font-size: 36px; font-weight: 700;
+      margin-bottom: 24px; color: #30d158;
+      border-bottom: 1px solid #333;
+      padding-bottom: 16px;
+    }
+    .preview-tech h2 { 
+      font-size: 26px; font-weight: 600;
+      margin-top: 36px; margin-bottom: 16px;
+      color: #2997ff;
+    }
+    .preview-tech th { 
+      background: #1c1c1e; color: #30d158;
+      padding: 16px; font-weight: 600;
+    }
+    .preview-tech td { 
+      padding: 16px; border-bottom: 1px solid #333;
+    }
+    .preview-tech code { 
+      background: #1c1c1e; color: #ff375f;
+      padding: 4px 10px; border-radius: 6px;
+    }
+    .preview-tech pre { 
+      background: #1c1c1e; padding: 24px;
+      border-radius: 12px; border: 1px solid #333;
+    }
+    
+    /* Preview - Nature */
+    .preview-nature { background: #fbfdf7; }
+    .preview-nature h1 { 
+      color: #1d5c3e; border-bottom-color: #c5e3d5;
+    }
+    .preview-nature h2 { color: #2d7a52; }
+    .preview-nature th { 
+      background: #1d5c3e; color: white;
+    }
+    .preview-nature blockquote { 
+      border-left-color: #34c759;
+      background: #f0faf4;
+    }
+    
+    /* Preview - Warm */
+    .preview-warm { background: #fffbf7; }
+    .preview-warm h1 { 
+      color: #8b4513; border-bottom-color: #ffd4a3;
+    }
+    .preview-warm h2 { color: #a0522d; }
+    .preview-warm th { 
+      background: #8b4513; color: white;
+    }
+    .preview-warm blockquote { 
+      border-left-color: #ff9500;
+      background: #fff5e6;
+    }
+    
+    /* Preview - Minimal */
+    .preview-minimal { background: white; }
+    .preview-minimal h1 { 
+      font-size: 40px; font-weight: 300;
+      letter-spacing: -0.03em;
+      border-bottom: none;
+    }
+    .preview-minimal h2 { 
+      font-size: 28px; font-weight: 400;
+      margin-top: 48px;
+    }
+    .preview-minimal th { 
+      background: #f5f5f7; color: #1d1d1f;
+      border-bottom: 2px solid #e5e5e7;
+    }
+    
+    /* Header blur */
+    .header-blur {
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
   </style>
 </head>
-<body class="min-h-screen">
-  <!-- 顶部导航 -->
-  <header class="glass sticky top-0 z-50 shadow-lg">
-    <div class="container mx-auto px-6 py-4">
+<body>
+  <!-- Header -->
+  <header class="header-blur fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
       <div class="flex items-center justify-between">
+        <!-- Logo -->
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-lg">🎨</div>
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg shadow-lg">
+            <i class="fas fa-pen-nib"></i>
+          </div>
           <div>
-            <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">VisualDoc</h1>
-            <p class="text-xs text-gray-500">可视化文档工具</p>
+            <h1 class="text-lg font-semibold tracking-tight">VisualDoc</h1>
+            <p class="text-xs text-gray-500 -mt-0.5">Beautiful Documents</p>
           </div>
         </div>
-        <nav class="flex gap-1 bg-gray-100/50 p-1 rounded-xl">
-          <button onclick="switchTab('visual')" id="tab-visual" class="px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 bg-white text-indigo-600 shadow-sm">
-            <i class="fas fa-project-diagram"></i><span>文本转可视化</span>
+        
+        <!-- Navigation -->
+        <div class="segmented-control">
+          <button onclick="switchTab('visual')" id="tab-visual" class="segmented-btn active">
+            <i class="fas fa-diagram-project mr-2"></i>可视化
           </button>
-          <button onclick="switchTab('markdown')" id="tab-markdown" class="px-6 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all flex items-center gap-2">
-            <i class="fas fa-file-pdf"></i><span>Markdown转PDF</span>
+          <button onclick="switchTab('markdown')" id="tab-markdown" class="segmented-btn">
+            <i class="fas fa-file-pdf mr-2"></i>PDF
           </button>
-        </nav>
-        <a href="https://github.com/forcoder/visualdoc" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
-          <i class="fab fa-github text-lg"></i><span class="text-sm font-medium">GitHub</span>
+        </div>
+        
+        <!-- GitHub -->
+        <a href="https://github.com/forcoder/visualdoc" target="_blank" 
+           class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
+          <i class="fab fa-github text-lg"></i>
         </a>
       </div>
     </div>
   </header>
 
-  <main class="container mx-auto px-6 py-8">
-    <!-- 文本转可视化 -->
-    <div id="content-visual" class="tab-content active">
-      <div class="glass rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 p-4">
-          <div class="flex items-center gap-4">
-            <button onclick="generateDiagram()" class="btn-primary px-6 py-2.5 rounded-xl text-white font-medium flex items-center gap-2 shadow-lg">
-              <i class="fas fa-magic"></i><span>生成图表</span>
-            </button>
-            <div class="h-6 w-px bg-gray-300"></div>
-            <button onclick="exportVisualPNG()" class="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
-              <i class="fas fa-image text-green-500"></i><span>导出 PNG</span>
-            </button>
-            <button onclick="exportVisualPDF()" class="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
-              <i class="fas fa-file-pdf text-red-500"></i><span>导出 PDF</span>
-            </button>
-          </div>
-        </div>
-        <div class="flex h-[calc(100vh-280px)]">
-          <div class="w-1/2 border-r border-gray-200 flex flex-col">
-            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-              <i class="fas fa-code text-gray-400"></i>
-              <span class="text-sm font-medium text-gray-700">文本输入</span>
-              <span class="ml-auto text-xs text-gray-400">支持 Markdown 格式</span>
+  <!-- Main Content -->
+  <main class="pt-24 pb-12 px-6">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Visual Tab -->
+      <div id="content-visual" class="tab-content active">
+        <div class="apple-card overflow-hidden">
+          <!-- Toolbar -->
+          <div class="border-b border-gray-100 px-6 py-4">
+            <div class="flex items-center gap-3">
+              <button onclick="generateDiagram()" class="apple-btn">
+                <i class="fas fa-wand-magic-sparkles mr-2"></i>生成图表
+              </button>
+              <div class="h-6 w-px bg-gray-200 mx-2"></div>
+              <button onclick="exportVisualPNG()" class="apple-btn apple-btn-secondary">
+                <i class="fas fa-image mr-2"></i>PNG
+              </button>
+              <button onclick="exportVisualPDF()" class="apple-btn apple-btn-secondary">
+                <i class="fas fa-file-pdf mr-2"></i>PDF
+              </button>
             </div>
-            <textarea id="visual-input" class="flex-1 p-6 font-mono text-sm resize-none focus:outline-none bg-white/50" placeholder="输入文本内容，点击生成图表..."># 项目流程
+          </div>
+          
+          <!-- Content -->
+          <div class="flex h-[calc(100vh-220px)]">
+            <!-- Editor -->
+            <div class="w-1/2 border-r border-gray-100 flex flex-col">
+              <div class="px-5 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-600">文本输入</span>
+                <span class="text-xs text-gray-400">Markdown</span>
+              </div>
+              <textarea id="visual-input" class="flex-1 p-6 text-[15px] resize-none focus:outline-none bg-transparent font-mono leading-relaxed" 
+                placeholder="输入文本内容..."># 项目流程
 
 ## 1. 需求分析
-- 收集用户需求
-- 竞品分析
+收集用户需求，进行竞品分析
 
 ## 2. 设计阶段
-- UI设计
-- 原型制作
+UI设计，原型制作
 
 ## 3. 开发阶段
-- 前端开发
-- 后端开发
+前端开发，后端开发
 
 ## 4. 测试上线
-- 功能测试
-- 正式发布</textarea>
-          </div>
-          <div class="w-1/2 flex flex-col bg-gray-50/50">
-            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-              <i class="fas fa-eye text-gray-400"></i>
-              <span class="text-sm font-medium text-gray-700">可视化预览</span>
+功能测试，正式发布</textarea>
             </div>
-            <div id="visual-preview" class="flex-1 p-6 overflow-auto flex items-center justify-center">
-              <div class="text-center text-gray-400">
-                <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-5xl mb-6 mx-auto">🎨</div>
-                <p class="text-lg font-medium text-gray-600 mb-2">点击"生成图表"按钮</p>
-                <p class="text-sm text-gray-400">将文本转换为可视化图表</p>
+            
+            <!-- Preview -->
+            <div class="w-1/2 flex flex-col bg-gray-50/30">
+              <div class="px-5 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-600">预览</span>
+              </div>
+              <div id="visual-preview" class="flex-1 p-8 overflow-auto flex items-center justify-center">
+                <div class="text-center">
+                  <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-3xl mb-4 mx-auto">
+                    🎨
+                  </div>
+                  <p class="text-gray-500 font-medium">点击生成图表</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Markdown转PDF -->
-    <div id="content-markdown" class="tab-content">
-      <div class="glass rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 p-5">
-          <div class="flex items-center gap-4 mb-5">
-            <span class="text-sm font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-palette text-indigo-500"></i>PDF 模板</span>
-            <div class="flex gap-3" id="template-selector">
-              <div onclick="selectTemplate('business')" class="template-card active w-28 h-20 rounded-xl border-2 border-indigo-500 bg-gradient-to-br from-blue-50 to-indigo-50 flex flex-col items-center justify-center gap-1 shadow-md" data-template="business">
-                <span class="text-2xl">💼</span><span class="text-xs font-semibold text-gray-700">商务蓝</span>
+      <!-- Markdown Tab -->
+      <div id="content-markdown" class="tab-content">
+        <div class="apple-card overflow-hidden">
+          <!-- Templates -->
+          <div class="border-b border-gray-100 px-6 py-5">
+            <div class="flex items-start gap-6">
+              <div>
+                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 block">模板</label>
+                <div class="flex gap-3" id="template-selector">
+                  <div onclick="selectTemplate('business')" class="template-card active w-24 bg-gradient-to-br from-gray-50 to-gray-100" data-template="business">
+                    <div class="w-8 h-8 rounded-lg bg-gray-900 mb-2"></div>
+                    <span class="text-xs font-medium">商务</span>
+                  </div>
+                  <div onclick="selectTemplate('tech')" class="template-card w-24 bg-black" data-template="tech">
+                    <div class="w-8 h-8 rounded-lg bg-green-500 mb-2"></div>
+                    <span class="text-xs font-medium text-white">科技</span>
+                  </div>
+                  <div onclick="selectTemplate('nature')" class="template-card w-24 bg-gradient-to-br from-green-50 to-emerald-50" data-template="nature">
+                    <div class="w-8 h-8 rounded-lg bg-green-600 mb-2"></div>
+                    <span class="text-xs font-medium">清新</span>
+                  </div>
+                  <div onclick="selectTemplate('warm')" class="template-card w-24 bg-gradient-to-br from-orange-50 to-amber-50" data-template="warm">
+                    <div class="w-8 h-8 rounded-lg bg-orange-500 mb-2"></div>
+                    <span class="text-xs font-medium">暖色</span>
+                  </div>
+                  <div onclick="selectTemplate('minimal')" class="template-card w-24 bg-white border border-gray-200" data-template="minimal">
+                    <div class="w-8 h-8 rounded-lg bg-gray-200 mb-2"></div>
+                    <span class="text-xs font-medium">极简</span>
+                  </div>
+                </div>
               </div>
-              <div onclick="selectTemplate('tech')" class="template-card w-28 h-20 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center gap-1 hover:border-gray-400" data-template="tech">
-                <span class="text-2xl">💻</span><span class="text-xs font-semibold text-gray-300">科技黑</span>
-              </div>
-              <div onclick="selectTemplate('nature')" class="template-card w-28 h-20 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-green-50 to-emerald-50 flex flex-col items-center justify-center gap-1 hover:border-green-400" data-template="nature">
-                <span class="text-2xl">🌿</span><span class="text-xs font-semibold text-gray-700">清新绿</span>
-              </div>
-              <div onclick="selectTemplate('warm')" class="template-card w-28 h-20 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-orange-50 to-amber-50 flex flex-col items-center justify-center gap-1 hover:border-orange-400" data-template="warm">
-                <span class="text-2xl">🧡</span><span class="text-xs font-semibold text-gray-700">暖色橙</span>
-              </div>
-              <div onclick="selectTemplate('minimal')" class="template-card w-28 h-20 rounded-xl border-2 border-gray-200 bg-white flex flex-col items-center justify-center gap-1 hover:border-gray-400" data-template="minimal">
-                <span class="text-2xl">⚪</span><span class="text-xs font-semibold text-gray-700">极简白</span>
+              
+              <div class="flex-1">
+                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 block">范例</label>
+                <div class="flex items-center gap-3">
+                  <select onchange="loadIndustryExample(this.value)" 
+                    class="appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer pr-10">
+                    <option value="">选择模板...</option>
+                    <optgroup label="商业">
+                      <option value="business-plan">商业计划书</option>
+                      <option value="project-proposal">项目提案</option>
+                    </optgroup>
+                    <optgroup label="技术">
+                      <option value="prd">PRD文档</option>
+                      <option value="tech-spec">技术方案</option>
+                    </optgroup>
+                  </select>
+                  <button onclick="clearMarkdown()" class="p-2.5 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                  <button onclick="exportMarkdownPDF()" class="apple-btn ml-auto">
+                    <i class="fas fa-download mr-2"></i>导出 PDF
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-4">
-            <span class="text-sm font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-book text-indigo-500"></i>行业范例</span>
-            <div class="relative">
-              <select onchange="loadIndustryExample(this.value)" class="appearance-none pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shadow-sm">
-                <option value="">选择模板...</option>
-                <optgroup label="💼 商业类">
-                  <option value="business-plan">商业计划书</option>
-                  <option value="project-proposal">项目提案</option>
-                  <option value="meeting-minutes">会议纪要</option>
-                </optgroup>
-                <optgroup label="💻 技术类">
-                  <option value="prd">产品需求文档</option>
-                  <option value="tech-spec">技术方案</option>
-                </optgroup>
-                <optgroup label="🎓 教育类">
-                  <option value="syllabus">教学大纲</option>
-                  <option value="experiment-report">实验报告</option>
-                </optgroup>
-              </select>
-              <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
-            </div>
-            <button onclick="clearMarkdown()" class="px-4 py-2.5 rounded-xl text-gray-600 hover:text-red-600 hover:bg-red-50 transition-all flex items-center gap-2 text-sm font-medium">
-              <i class="fas fa-trash-alt"></i>清空
-            </button>
-            <button onclick="exportMarkdownPDF()" class="ml-auto btn-primary px-6 py-2.5 rounded-xl text-white font-medium flex items-center gap-2 shadow-lg">
-              <i class="fas fa-download"></i><span>导出 PDF</span>
-            </button>
-          </div>
-        </div>
-        <div class="flex h-[calc(100vh-340px)]">
-          <div class="w-1/2 border-r border-gray-200 flex flex-col">
-            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <i class="fas fa-edit text-gray-400"></i>
-                <span class="text-sm font-medium text-gray-700">Markdown 编辑</span>
+          
+          <!-- Editor & Preview -->
+          <div class="flex h-[calc(100vh-300px)]">
+            <!-- Editor -->
+            <div class="w-1/2 border-r border-gray-100 flex flex-col">
+              <div class="px-5 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-600">编辑器</span>
+                <span class="text-xs text-gray-400">Markdown</span>
               </div>
-              <span class="text-xs text-gray-400">支持标准 Markdown 语法</span>
-            </div>
-            <textarea id="markdown-input" class="flex-1 p-6 font-mono text-sm resize-none focus:outline-none bg-white/50" placeholder="在此输入 Markdown 内容，或选择上方行业范例..."># 欢迎使用 VisualDoc
+              <textarea id="markdown-input" class="flex-1 p-6 text-[15px] resize-none focus:outline-none bg-transparent font-mono leading-relaxed" 
+                placeholder="开始写作..."># 欢迎使用 VisualDoc
 
-## 专业的 PDF 文档生成工具
+VisualDoc 是一款优雅的文档工具，帮助您快速创建精美的 PDF 文档。
 
-VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美观。
+## 特性
 
-### 🎨 模板特色
+- 🎨 **精美模板** - 多种专业模板可选
+- ✨ **实时预览** - 所见即所得
+- 📱 **响应式设计** - 适配各种设备
+- ⚡ **快速导出** - 一键生成 PDF
 
-1. **商务蓝** - 专业稳重，适合商业文档
-2. **科技黑** - 现代时尚，适合技术文档
-3. **清新绿** - 自然简约，适合教育环保
-4. **暖色橙** - 温暖活泼，适合营销创意
-5. **极简白** - 纯净留白，适合设计作品
+## 开始使用
 
-### ✨ 核心功能
-
-| 功能 | 描述 |
-|------|------|
-| 模板切换 | 5种精美模板实时切换 |
-| 行业范例 | 15+行业模板一键加载 |
-| 实时预览 | 所见即所得的编辑体验 |
-| PDF导出 | 高质量PDF文档生成 |
+在左侧编辑器中输入 Markdown 内容，右侧将实时预览效果。选择喜欢的模板，点击导出即可。
 
 ---
 
-> 🦞 由小龙、小小、小优、小测团队精心打造</textarea>
-          </div>
-          <div class="w-1/2 flex flex-col">
-            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <i class="fas fa-eye text-gray-400"></i>
-                <span class="text-sm font-medium text-gray-700">实时预览</span>
-              </div>
-              <span id="current-template-name" class="text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full font-medium">💼 商务蓝</span>
+*由小龙团队精心打造*</textarea>
             </div>
-            <div class="flex-1 overflow-auto bg-white">
-              <div id="markdown-preview" class="preview-business p-8 max-w-3xl mx-auto min-h-full"></div>
+            
+            <!-- Preview -->
+            <div class="w-1/2 flex flex-col bg-gray-50/30">
+              <div class="px-5 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-600">预览</span>
+                <span id="current-template-name" class="text-xs px-3 py-1 bg-gray-200 rounded-full font-medium">商务</span>
+              </div>
+              <div class="flex-1 overflow-auto">
+                <div id="markdown-preview" class="preview-business p-10 max-w-2xl mx-auto min-h-full"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </main>
-
-  <footer class="glass mt-8 py-4 text-center text-sm text-gray-600">
-    <p>🦞 由小龙、小小、小优、小测团队打造 | VisualDoc 2026</p>
-  </footer>
 
   <script>
     let currentTemplate = 'business';
@@ -253,12 +494,8 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
     function switchTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.getElementById('content-' + tab).classList.add('active');
-      document.querySelectorAll('nav button').forEach(el => {
-        el.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
-        el.classList.add('text-gray-600');
-      });
-      document.getElementById('tab-' + tab).classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
-      document.getElementById('tab-' + tab).classList.remove('text-gray-600');
+      document.querySelectorAll('.segmented-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
     }
 
     function generateDiagram() {
@@ -270,28 +507,25 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
       lines.forEach((line) => {
         const trimmed = line.trim();
         if (trimmed.startsWith('# ')) {
-          const content = trimmed.replace('# ', '');
           nodeIndex++;
-          code += `  A[${content}]\n`;
+          code += `  A[${trimmed.replace('# ', '')}]\n`;
           nodes.push('A');
         } else if (trimmed.startsWith('## ')) {
-          const content = trimmed.replace('## ', '');
           const nodeId = String.fromCharCode(65 + nodeIndex);
           nodeIndex++;
-          code += `  ${nodeId}[${content}]\n`;
+          code += `  ${nodeId}[${trimmed.replace('## ', '')}]\n`;
           nodes.push(nodeId);
           if (nodes.length > 1) code += `  ${nodes[nodes.length - 2]} --> ${nodeId}\n`;
         }
       });
-      if (nodes.length === 0) code = `graph TD\n  A[请输入内容] --> B[点击生成图表]`;
+      if (nodes.length === 0) code = `graph TD\n  A[开始] --> B[结束]`;
       const preview = document.getElementById('visual-preview');
       preview.innerHTML = `<div class="mermaid">${code}</div>`;
       mermaid.run({ nodes: preview.querySelectorAll('.mermaid') });
     }
 
     function exportVisualPNG() {
-      const preview = document.getElementById('visual-preview');
-      html2canvas(preview, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+      html2canvas(document.getElementById('visual-preview'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'chart.png';
         link.href = canvas.toDataURL('image/png');
@@ -300,48 +534,35 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
     }
 
     function exportVisualPDF() {
-      const preview = document.getElementById('visual-preview');
-      html2canvas(preview, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+      html2canvas(document.getElementById('visual-preview'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4');
-        const imgData = canvas.toDataURL('image/png');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 297, 210);
         pdf.save('chart.pdf');
       });
     }
 
     function updateMarkdownPreview() {
-      const markdown = document.getElementById('markdown-input').value;
-      const html = marked.parse(markdown);
-      document.getElementById('markdown-preview').innerHTML = html;
+      document.getElementById('markdown-preview').innerHTML = marked.parse(document.getElementById('markdown-input').value);
     }
 
     document.getElementById('markdown-input').addEventListener('input', updateMarkdownPreview);
 
     function selectTemplate(template) {
       currentTemplate = template;
-      document.querySelectorAll('.template-card').forEach(card => {
-        card.classList.remove('active', 'border-indigo-500');
-        card.classList.add('border-gray-200');
-      });
-      document.querySelector(`[data-template="${template}"]`).classList.add('active', 'border-indigo-500');
-      document.querySelector(`[data-template="${template}"]`).classList.remove('border-gray-200');
-      const preview = document.getElementById('markdown-preview');
-      preview.className = `preview-${template} p-8 max-w-3xl mx-auto min-h-full`;
-      const templateNames = { 'business': '💼 商务蓝', 'tech': '💻 科技黑', 'nature': '🌿 清新绿', 'warm': '🧡 暖色橙', 'minimal': '⚪ 极简白' };
-      document.getElementById('current-template-name').textContent = templateNames[template];
+      document.querySelectorAll('.template-card').forEach(card => card.classList.remove('active'));
+      document.querySelector(`[data-template="${template}"]`).classList.add('active');
+      document.getElementById('markdown-preview').className = `preview-${template} p-10 max-w-2xl mx-auto min-h-full`;
+      const names = { business: '商务', tech: '科技', nature: '清新', warm: '暖色', minimal: '极简' };
+      document.getElementById('current-template-name').textContent = names[template];
       updateMarkdownPreview();
     }
 
     function loadIndustryExample(example) {
-      if (!example) return;
       const examples = {
-        'business-plan': `# 商业计划书\n\n## 执行摘要\n\n本项目旨在通过创新的技术解决方案，解决行业痛点，创造显著的商业价值。\n\n## 市场分析\n\n### 市场规模\n- 目标市场：$10亿\n- 年增长率：25%\n- 潜在客户：100万+\n\n## 财务预测\n\n| 年度 | 收入 | 成本 | 利润 |\n|------|------|------|------|\n| 第1年 | $500K | $400K | $100K |\n| 第2年 | $2M | $1.2M | $800K |\n| 第3年 | $5M | $2.5M | $2.5M |`,
-        'project-proposal': `# 项目提案\n\n## 项目背景\n\n随着数字化转型的深入，企业对于高效协作工具的需求日益增长。\n\n## 项目目标\n\n1. 提高团队协作效率 **50%**\n2. 降低沟通成本 **30%**\n3. 提升项目交付质量\n\n## 预算估算\n\n总预算：¥800,000\n\n---\n\n**项目负责人**：张经理  \n**提案日期**：2026年3月`,
-        'meeting-minutes': `# 项目周会纪要\n\n## 会议信息\n\n- **时间**：2026年3月26日 14:00-15:30\n- **地点**：会议室A\n- **主持人**：项目经理\n\n## 行动计划\n\n| 任务 | 负责人 | 截止日期 |\n|------|--------|----------|\n| 修复Bug | 王开发 | 3月28日 |\n| 接口联调 | 李后端 | 3月29日 |`,
-        'prd': `# 产品需求文档 (PRD)\n\n## 1. 产品概述\n\n### 1.1 产品背景\n描述产品产生的背景和市场需求...\n\n### 1.2 产品目标\n- 目标用户：xxx\n- 核心目标：解决xxx问题\n\n## 2. 功能需求\n\n| 功能 | 优先级 | 描述 |\n|------|--------|------|\n| 注册登录 | P0 | 支持手机号、邮箱注册 |\n| 个人中心 | P1 | 用户信息管理 |`
+        'business-plan': `# 商业计划书\n\n## 概述\n\n本项目旨在打造下一代文档工具。\n\n## 市场分析\n\n| 指标 | 数值 |\n|------|------|\n| 市场规模 | $10亿 |\n| 增长率 | 25% |\n\n## 财务预测\n\n首年目标营收 **$500K**。`,
+        'project-proposal': `# 项目提案\n\n## 背景\n\n随着远程办公普及，高效协作工具需求激增。\n\n## 目标\n\n1. 提高效率 50%\n2. 降低成本 30%\n\n## 预算\n\n总预算：¥800,000`,
+        'prd': `# 产品需求文档\n\n## 功能需求\n\n| 功能 | 优先级 |\n|------|--------|\n| 用户系统 | P0 |\n| 支付模块 | P1 |\n\n## 技术方案\n\n采用 React + Node.js 架构。`
       };
       if (examples[example]) {
         document.getElementById('markdown-input').value = examples[example];
@@ -350,33 +571,28 @@ VisualDoc 提供多种精美的 **PDF 模板**，让您的文档更加专业美�
     }
 
     function clearMarkdown() {
-      if (confirm('确定要清空内容吗？')) {
+      if (confirm('确定清空？')) {
         document.getElementById('markdown-input').value = '';
         updateMarkdownPreview();
       }
     }
 
     function exportMarkdownPDF() {
-      const preview = document.getElementById('markdown-preview');
-      html2canvas(preview, { backgroundColor: '#ffffff', scale: 2, useCORS: true }).then(canvas => {
+      html2canvas(document.getElementById('markdown-preview'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         const imgData = canvas.toDataURL('image/png');
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = canvas.width;
-        const imgHeight = canvas.height;
-        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-        const imgX = (pdfWidth - imgWidth * ratio) / 2;
-        let imgY = 10;
-        const scaledHeight = imgHeight * ratio * (pdfWidth / (imgWidth * ratio));
-        let heightLeft = scaledHeight;
-        pdf.addImage(imgData, 'PNG', imgX, imgY, pdfWidth - 20, (pdfWidth - 20) * (imgHeight / imgWidth));
-        heightLeft -= pdfHeight;
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        let heightLeft = pdfHeight;
+        let position = 0;
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= 297;
         while (heightLeft > 0) {
+          position = heightLeft - pdfHeight;
           pdf.addPage();
-          pdf.addImage(imgData, 'PNG', imgX, heightLeft - scaledHeight, pdfWidth - 20, (pdfWidth - 20) * (imgHeight / imgWidth));
-          heightLeft -= pdfHeight;
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+          heightLeft -= 297;
         }
         pdf.save('document.pdf');
       });
