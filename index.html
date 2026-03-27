@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
   <script src="ai-manager.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -303,11 +304,14 @@
         
         <!-- Navigation -->
         <div class="segmented-control">
-          <button onclick="switchTab('visual')" id="tab-visual" class="segmented-btn active">
+          <button onclick="switchTab('visual')" id="tab-visual" class="segmented-btn">
             <i class="fas fa-diagram-project mr-2"></i>可视化
           </button>
           <button onclick="switchTab('markdown')" id="tab-markdown" class="segmented-btn">
             <i class="fas fa-file-pdf mr-2"></i>PDF
+          </button>
+          <button onclick="switchTab('ppt')" id="tab-ppt" class="segmented-btn active">
+            <i class="fas fa-file-powerpoint mr-2"></i>PPT
           </button>
         </div>
         
@@ -613,6 +617,141 @@ VisualDoc 是一款优雅的文档工具，帮助您快速创建精美的 PDF �
           </div>
         </div>
       </div>
+
+      <!-- PPT Tab -->
+      <div id="content-ppt" class="tab-content">
+        <div class="apple-card overflow-hidden">
+          <!-- PPT Generator -->
+          <div class="p-8">
+            <!-- Step 1 -->
+            <div class="mb-8">
+              <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 block">
+                <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>第一步：输入主题
+              </label>
+              <textarea id="ppt-topic" rows="3" 
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                placeholder="例如：2024年度工作总结报告、人工智能发展趋势、新产品发布会..."></textarea>
+            </div>
+
+            <!-- Step 2: Style -->
+            <div class="mb-8">
+              <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 block">
+                <i class="fas fa-palette mr-2 text-purple-500"></i>第二步：选择风格
+              </label>
+              <div class="grid grid-cols-4 gap-4" id="ppt-style-selector">
+                <div onclick="selectPPTStyle('business')" class="ppt-style-card active border-3 border-transparent rounded-xl p-4 cursor-pointer transition-all bg-gradient-to-br from-blue-50 to-blue-100 hover:scale-105" data-style="business">
+                  <div class="w-10 h-10 rounded-xl bg-blue-500 mb-2 flex items-center justify-center text-white">
+                    <i class="fas fa-briefcase"></i>
+                  </div>
+                  <h3 class="font-semibold text-sm">商务蓝</h3>
+                  <p class="text-xs text-gray-500">专业正式</p>
+                </div>
+                <div onclick="selectPPTStyle('tech')" class="ppt-style-card border-3 border-transparent rounded-xl p-4 cursor-pointer transition-all bg-gradient-to-br from-gray-800 to-gray-900 hover:scale-105" data-style="tech">
+                  <div class="w-10 h-10 rounded-xl bg-green-500 mb-2 flex items-center justify-center text-white">
+                    <i class="fas fa-microchip"></i>
+                  </div>
+                  <h3 class="font-semibold text-sm text-white">科技黑</h3>
+                  <p class="text-xs text-gray-400">现代简约</p>
+                </div>
+                <div onclick="selectPPTStyle('creative')" class="ppt-style-card border-3 border-transparent rounded-xl p-4 cursor-pointer transition-all bg-gradient-to-br from-pink-50 to-purple-100 hover:scale-105" data-style="creative">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 mb-2 flex items-center justify-center text-white">
+                    <i class="fas fa-paint-brush"></i>
+                  </div>
+                  <h3 class="font-semibold text-sm">创意紫</h3>
+                  <p class="text-xs text-gray-500">活力时尚</p>
+                </div>
+                <div onclick="selectPPTStyle('minimal')" class="ppt-style-card border-3 border-transparent rounded-xl p-4 cursor-pointer transition-all bg-white border border-gray-200 hover:scale-105" data-style="minimal">
+                  <div class="w-10 h-10 rounded-xl bg-gray-200 mb-2 flex items-center justify-center text-gray-600">
+                    <i class="fas fa-minus"></i>
+                  </div>
+                  <h3 class="font-semibold text-sm">极简白</h3>
+                  <p class="text-xs text-gray-500">清爽干净</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Settings -->
+            <div class="mb-8">
+              <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 block">
+                <i class="fas fa-sliders mr-2 text-green-500"></i>第三步：设置参数
+              </label>
+              <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gray-50 rounded-xl p-4">
+                  <label class="text-xs text-gray-500 mb-2 block">页数</label>
+                  <select id="ppt-slide-count" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <option value="5">5 页（快速）</option>
+                    <option value="10" selected>10 页（标准）</option>
+                    <option value="15">15 页（详细）</option>
+                    <option value="20">20 页（完整）</option>
+                  </select>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4">
+                  <label class="text-xs text-gray-500 mb-2 block">语言</label>
+                  <select id="ppt-language" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <option value="zh" selected>中文</option>
+                    <option value="en">English</option>
+                  </select>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4">
+                  <label class="text-xs text-gray-500 mb-2 block">AI 模型</label>
+                  <div id="ppt-ai-status" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-500">
+                    点击右上角配置
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button onclick="generatePPT()" id="ppt-generate-btn" class="w-full apple-btn text-lg py-4">
+              <i class="fas fa-wand-magic-sparkles mr-2"></i>生成演示文稿
+            </button>
+
+            <!-- Progress -->
+            <div id="ppt-progress" class="hidden mt-6">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700" id="ppt-progress-text">正在生成...</span>
+                <span class="text-sm text-gray-500" id="ppt-progress-percent">0%</span>
+              </div>
+              <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all" id="ppt-progress-bar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Outline Preview -->
+            <div id="ppt-outline-section" class="hidden mt-8">
+              <div class="flex items-center justify-between mb-4">
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                  <i class="fas fa-list mr-2"></i>生成的大纲
+                </label>
+                <button onclick="regeneratePPTOutline()" class="text-sm text-purple-600 hover:text-purple-700">
+                  <i class="fas fa-refresh mr-1"></i>重新生成
+                </button>
+              </div>
+              <div id="ppt-outline-content" class="bg-gray-50 rounded-xl p-4 max-h-64 overflow-y-auto"></div>
+            </div>
+
+            <!-- Download Section -->
+            <div id="ppt-download-section" class="hidden mt-8">
+              <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-green-500 mx-auto mb-4 flex items-center justify-center">
+                  <i class="fas fa-check text-2xl text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">PPT 生成完成！</h3>
+                <p class="text-sm text-gray-500 mb-4" id="ppt-slide-info">共 10 页幻灯片</p>
+                <button onclick="downloadPPT()" class="apple-btn">
+                  <i class="fas fa-download mr-2"></i>下载 PPTX 文件
+                </button>
+              </div>
+              
+              <!-- Slide Preview Grid -->
+              <div class="mt-6">
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 block">幻灯片预览</label>
+                <div id="ppt-preview-grid" class="grid grid-cols-5 gap-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -896,6 +1035,129 @@ VisualDoc 是一款优雅的文档工具，帮助您快速创建精美的 PDF �
       });
       console.log('[AI] 已加载保存的 API Keys');
     });
+
+    // ===== PPT Generator =====
+    let currentPPTStyle = 'business';
+    let generatedOutline = [];
+    let generatedSlides = [];
+    let pptx = null;
+
+    const pptStyles = {
+      business: { name: '商务蓝', primary: '1E3A5F', secondary: '4A90D9', bg: 'FFFFFF', text: '333333', header: '1E3A5F', headerText: 'FFFFFF' },
+      tech: { name: '科技黑', primary: '000000', secondary: '30D158', bg: '000000', text: 'F5F5F7', header: '1C1C1E', headerText: 'FFFFFF' },
+      creative: { name: '创意紫', primary: '8B5CF6', secondary: 'EC4899', bg: 'FFFFFF', text: '374151', header: '8B5CF6', headerText: 'FFFFFF' },
+      minimal: { name: '极简白', primary: '000000', secondary: '666666', bg: 'FFFFFF', text: '000000', header: 'F5F5F7', headerText: '000000' }
+    };
+
+    function selectPPTStyle(style) {
+      currentPPTStyle = style;
+      document.querySelectorAll('.ppt-style-card').forEach(card => card.classList.remove('active'));
+      document.querySelector(`.ppt-style-card[data-style="${style}"]`).classList.add('active');
+    }
+
+    function updatePPTProgress(percent, text) {
+      document.getElementById('ppt-progress').classList.remove('hidden');
+      document.getElementById('ppt-progress-bar').style.width = `${percent}%`;
+      document.getElementById('ppt-progress-percent').textContent = `${percent}%`;
+      if (text) document.getElementById('ppt-progress-text').textContent = text;
+    }
+
+    async function generatePPT() {
+      const topic = document.getElementById('ppt-topic').value.trim();
+      if (!topic) { alert('请输入主题'); return; }
+
+      const btn = document.getElementById('ppt-generate-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>生成中...';
+
+      try {
+        const slideCount = parseInt(document.getElementById('ppt-slide-count').value);
+        const language = document.getElementById('ppt-language').value;
+
+        // Generate outline
+        updatePPTProgress(10, '正在生成大纲...');
+        
+        if (!window.aiManager?.getAvailableModels()?.length) {
+          throw new Error('请先配置 AI 模型');
+        }
+
+        const lang = language === 'zh' ? '中文' : 'English';
+        const outlineResult = await window.aiManager.callAI([
+          { role: 'system', content: `你是PPT大纲专家。生成${slideCount}页的PPT大纲，使用${lang}。直接返回JSON数组：[{"title":"标题","content":["要点1","要点2"]}]` },
+          { role: 'user', content: `主题：${topic}\n页数：${slideCount}` }
+        ]);
+
+        // Parse JSON
+        let jsonStr = outlineResult.data;
+        const match = jsonStr.match(/\[[\s\S]*?\]/);
+        if (match) jsonStr = match[0];
+        generatedOutline = JSON.parse(jsonStr);
+
+        updatePPTProgress(50, '正在生成幻灯片...');
+
+        // Generate slides
+        const style = pptStyles[currentPPTStyle];
+        generatedSlides = generatedOutline.map((slide, i) => ({
+          title: slide.title,
+          bullets: slide.content || [],
+          style: style,
+          num: i + 1,
+          total: generatedOutline.length
+        }));
+
+        updatePPTProgress(80, '正在创建 PPTX...');
+
+        // Create PPTX
+        const PptxGen = window.PptxGen;
+        pptx = new PptxGen();
+        pptx.layout = 'LAYOUT_16x9';
+        pptx.title = topic;
+
+        for (const s of generatedSlides) {
+          const slide = pptx.addSlide();
+          slide.background = { color: s.style.bg };
+          
+          slide.addShape('rect', { x: 0, y: 0, w: '100%', h: 1.2, fill: { color: s.style.header } });
+          slide.addText(`${s.num} / ${s.total}`, { x: 0.5, y: 0.35, w: 2, h: 0.5, fontSize: 12, color: s.style.headerText });
+          slide.addText(s.title, { x: 0.5, y: 0.35, w: 9, h: 0.5, fontSize: 24, bold: true, color: s.style.headerText, align: 'center' });
+          
+          const bullets = s.bullets.map(b => ({ text: b, options: { bullet: true } }));
+          slide.addText(bullets, { x: 0.8, y: 1.6, w: 8.4, h: 3.5, fontSize: 18, color: s.style.text, valign: 'top', lineSpacing: 28 });
+        }
+
+        updatePPTProgress(100, '完成！');
+        
+        // Show results
+        document.getElementById('ppt-outline-section').classList.remove('hidden');
+        document.getElementById('ppt-outline-content').innerHTML = generatedOutline.map((s, i) => 
+          `<div class="flex items-start gap-3 py-2 ${i > 0 ? 'border-t border-gray-200' : ''}">
+            <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 text-xs flex items-center justify-center">${i + 1}</span>
+            <div><h4 class="font-medium text-sm">${s.title}</h4><p class="text-xs text-gray-500 mt-1">${(s.content || []).slice(0, 2).join(' · ')}</p></div>
+          </div>`
+        ).join('');
+
+        document.getElementById('ppt-download-section').classList.remove('hidden');
+        document.getElementById('ppt-slide-info').textContent = `共 ${generatedSlides.length} 页幻灯片`;
+        document.getElementById('ppt-preview-grid').innerHTML = generatedSlides.map(s => 
+          `<div class="aspect-video rounded-lg flex items-center justify-center text-xs font-medium" style="background: #${s.style.header}; color: #${s.style.headerText}">${s.num}. ${s.title}</div>`
+        ).join('');
+
+      } catch (error) {
+        alert('生成失败: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-wand-magic-sparkles mr-2"></i>生成演示文稿';
+      }
+    }
+
+    function regeneratePPTOutline() {
+      generatePPT();
+    }
+
+    function downloadPPT() {
+      if (!pptx) { alert('请先生成 PPT'); return; }
+      pptx.writeFile({ fileName: `${document.getElementById('ppt-topic').value || 'presentation'}.pptx` });
+    }
   </script>
 </body>
 </html>
